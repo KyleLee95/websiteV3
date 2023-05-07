@@ -1,16 +1,13 @@
 import { useRef, useEffect } from 'react'
 import { useLoader } from '@react-three/fiber'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import { Group } from 'three'
 
 export function Rocket() {
   const rocketRef = useRef(null)
   useEffect(() => {
-    console.log(rocketRef.current.rotation)
     rocketRef.current.rotation.set(-1.5, 0, 0)
 
     document.addEventListener('keydown', (e) => {
-      console.log('e', e)
       const keyCode = e.which
       // up
       if (keyCode == 38) {
@@ -33,5 +30,5 @@ export function Rocket() {
   }, [rocketRef])
 
   const gltf = useLoader(GLTFLoader, '/rocket.glb')
-  return <primitive ref={rocketRef} position={[1, 1, 1]} object={gltf.scene} scale={0.09} />
+  return <primitive ref={rocketRef} position={[10, 10, 10]} object={gltf.scene} scale={1} />
 }

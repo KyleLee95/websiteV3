@@ -3,10 +3,10 @@ import * as THREE from 'three'
 import { useThree } from '@react-three/fiber'
 export const Galaxy = () => {
   const parameters = {
-    count: 99400,
-    size: 0.1,
-    radius: 12.14,
-    branches: 5,
+    count: 260900,
+    size: 5,
+    radius: 20300,
+    branches: 7,
     spin: -0.532,
     randomness: 0.304,
     randomnessPower: 4.252,
@@ -68,6 +68,29 @@ export const Galaxy = () => {
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3))
   geometry.setAttribute('color', new THREE.BufferAttribute(colors, 3))
   const points = new THREE.Points(geometry, material)
-
-  return <primitive object={points} />
+  return (
+    <points>
+      <bufferGeometry attach='geometry'>
+        <bufferAttribute
+          attach='attributes-position' //attribute parameter yang akan dikontrol
+          array={positions}
+          count={positions.length / 3} //
+          itemSize={3} //dikeranakan telah diketahui bahwa tiap arraytype axis akan berisi 3 value pada 1d array
+        />
+        <bufferAttribute
+          attach='attributes-color' //attribute parameter yang akan dikontrol
+          array={colors}
+          count={colors.length / 3} //
+          itemSize={3} //dikeranakan telah diketahui bahwa tiap arraytype axis akan berisi 3 value pada 1d array
+        />
+      </bufferGeometry>
+      <pointsMaterial
+        size={parameters.size}
+        sizeAttenuation={true}
+        depthWrite={false}
+        blending={THREE.AdditiveBlending}
+        vertexColors={true}
+      />
+    </points>
+  ) /* return <primitive object={points} /> */
 }
