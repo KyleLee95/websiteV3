@@ -3,12 +3,12 @@ import * as THREE from 'three'
 import { useThree } from '@react-three/fiber'
 export const Galaxy = () => {
   const parameters = {
-    count: 260900,
-    size: 5,
-    radius: 20300,
+    count: 36000,
+    size: 2,
+    radius: 1600,
     branches: 7,
-    spin: -0.532,
-    randomness: 0.304,
+    spin: -0.732,
+    randomness: 3.04,
     randomnessPower: 4.252,
     insideColor: '#be95d0',
     outsideColor: '#7196f4',

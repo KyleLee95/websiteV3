@@ -40,7 +40,7 @@ export default function Page() {
   return (
     <>
       <div className='h-full w-full'>
-        <View orbit={true} className='h-full w-full'>
+        <View orbit={false} className='h-full w-full'>
           <Suspense fallback={null}>
             {planets.map((planet) => {
               return <Planet key={planet.name} position={planet.position} planet={planet.name} scale={planet.scale} />
