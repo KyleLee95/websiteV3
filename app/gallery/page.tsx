@@ -4,22 +4,37 @@ import dynamic from 'next/dynamic'
 import { Suspense } from 'react'
 import { Vector3 } from 'three'
 import { KeyboardControls } from '@react-three/drei'
-interface PlanetType {
+
+interface SceneObjectType {
   name: string
   position: Vector3
   scale: number
+  type: string
+  children: Array<SceneObjectType>
 }
-const planets: PlanetType[] = [
-  { name: 'dione', position: new THREE.Vector3(50, 5, 0), scale: 0.015 },
-  { name: 'itokawa', position: new THREE.Vector3(-30, 0, -30), scale: 0.0025 },
-  { name: 'titan', position: new THREE.Vector3(-100, 0, 0), scale: 0.015 },
-  //  { name: 'sun', position: new THREE.Vector3(0, 0, 0), scale: 0.025 },
+const sceneObjects: SceneObjectType[] = [
+  {
+    name: 'dione',
+    position: new THREE.Vector3(50, 5, 0),
+    scale: 0.015,
+    type: 'planet',
+    children: [{ name: 'TGO', position: new THREE.Vector3(2000, 0, 0), scale: 55, type: 'satellite', children: [] }],
+  },
+  { name: 'itokawa', position: new THREE.Vector3(-30, 0, -30), scale: 0.0025, type: 'satellite', children: [] },
+  {
+    name: 'titan',
+    position: new THREE.Vector3(-100, 0, 0),
+    scale: 0.015,
+    type: 'planet',
+    children: [],
+  },
+  { name: 'sun', position: new THREE.Vector3(0, 0, -55), scale: 0.025, type: 'planet', children: [] },
 ]
 const Galaxy = dynamic(() => import('@/components/canvas/Galaxy').then((mod) => mod.Galaxy), { ssr: false })
-const Sphere = dynamic(() => import('@/components/canvas/Sphere').then((mod) => mod.Sphere), { ssr: false })
 const Rocket = dynamic(() => import('@/components/canvas/Rocket').then((mod) => mod.Rocket), { ssr: false })
-const Planet = dynamic(() => import('@/components/canvas/Planet').then((mod) => mod.Planet), { ssr: false })
-const Logo = dynamic(() => import('@/components/canvas/Examples').then((mod) => mod.Logo), { ssr: false })
+const SceneObject = dynamic(() => import('@/components/canvas/SceneObject').then((mod) => mod.SceneObject), {
+  ssr: false,
+})
 const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.View), {
   ssr: false,
   loading: () => (
@@ -43,8 +58,8 @@ export default function Page() {
       <div className='h-full w-full'>
         <View orbit={true} className='h-full w-full'>
           <Suspense fallback={null}>
-            {planets.map((planet) => {
-              return <Planet key={planet.name} position={planet.position} planet={planet.name} scale={planet.scale} />
+            {sceneObjects.map((object) => {
+              return <SceneObject key={object.name} object={object} />
             })}
 
             <gridHelper />

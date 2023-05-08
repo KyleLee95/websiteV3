@@ -28,6 +28,7 @@ export function Rocket() {
   const currLookAt = new THREE.Vector3()
 
   const [subscribeKeys, getKeys] = useKeyboardControls()
+
   useEffect(() => {
     //rotate the rocket so that it's sideways
     rocketGroup.current.rotation.set(-1.5, 0, 0)
@@ -47,6 +48,7 @@ export function Rocket() {
       rocketGroup.current.rotateZ(angleOfRotation)
     }
   })
+
   //chase camera
   useFrame((state, delta) => {
     const group = rocketGroup.current
@@ -61,6 +63,7 @@ export function Rocket() {
     state.camera.position.copy(currPosition)
     state.camera.lookAt(currLookAt)
   })
+
   const gltf = useLoader(GLTFLoader, '/rocket.glb')
 
   return (
