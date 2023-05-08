@@ -12,7 +12,7 @@ const planets: PlanetType[] = [
   { name: 'dione', position: new THREE.Vector3(50, 5, 0), scale: 0.015 },
   { name: 'itokawa', position: new THREE.Vector3(-30, 0, -30), scale: 0.0025 },
   { name: 'titan', position: new THREE.Vector3(-100, 0, 0), scale: 0.015 },
-  { name: 'sun', position: new THREE.Vector3(0, 0, 0), scale: 0.025 },
+  //  { name: 'sun', position: new THREE.Vector3(0, 0, 0), scale: 0.025 },
 ]
 const Galaxy = dynamic(() => import('@/components/canvas/Galaxy').then((mod) => mod.Galaxy), { ssr: false })
 const Sphere = dynamic(() => import('@/components/canvas/Sphere').then((mod) => mod.Sphere), { ssr: false })
@@ -40,11 +40,13 @@ export default function Page() {
   return (
     <>
       <div className='h-full w-full'>
-        <View orbit={false} className='h-full w-full'>
+        <View orbit={true} className='h-full w-full'>
           <Suspense fallback={null}>
             {planets.map((planet) => {
               return <Planet key={planet.name} position={planet.position} planet={planet.name} scale={planet.scale} />
             })}
+
+            <gridHelper />
             <Galaxy />
             <Rocket />
             <Common color='black' />
