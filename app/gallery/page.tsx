@@ -18,7 +18,7 @@ const sceneObjects: SceneObjectType[] = [
     position: new THREE.Vector3(50, 5, 0),
     scale: 0.015,
     type: 'planet',
-    children: [{ name: 'TGO', position: new THREE.Vector3(2000, 0, 0), scale: 55, type: 'satellite', children: [] }],
+    children: [{ name: 'tgo', position: new THREE.Vector3(2000, 0, 0), scale: 55, type: 'satellite', children: [] }],
   },
   { name: 'itokawa', position: new THREE.Vector3(-30, 0, -30), scale: 0.0025, type: 'satellite', children: [] },
   {
