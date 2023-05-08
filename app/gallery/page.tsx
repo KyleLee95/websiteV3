@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import dynamic from 'next/dynamic'
 import { Suspense } from 'react'
 import { Vector3 } from 'three'
+import { KeyboardControls } from '@react-three/drei'
 interface PlanetType {
   name: string
   position: Vector3
@@ -48,7 +49,16 @@ export default function Page() {
 
             <gridHelper />
             <Galaxy />
-            <Rocket />
+
+            <KeyboardControls
+              map={[
+                { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
+                { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
+                { name: 'right', keys: ['ArrowRight', 'KeyD'] },
+              ]}
+            >
+              <Rocket />
+            </KeyboardControls>
             <Common color='black' />
           </Suspense>
         </View>
