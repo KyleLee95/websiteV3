@@ -1,10 +1,11 @@
 'use client'
 import * as THREE from 'three'
 import dynamic from 'next/dynamic'
+import { GLTFLoader } from 'three-stdlib'
+import { useLoader } from '@react-three/fiber'
 import { Suspense } from 'react'
 import { Vector3 } from 'three'
-import { KeyboardControls } from '@react-three/drei'
-
+import { KeyboardControls, Html, useProgress } from '@react-three/drei'
 interface SceneObjectType {
   name: string
   position: Vector3
@@ -81,30 +82,19 @@ const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mo
 
 export default function Page() {
   return (
-    <>
-      <div className='h-full w-full'>
-        <View orbit={true} className='h-full w-full'>
-          <Suspense fallback={null}>
-            {sceneObjects.map((object) => {
-              return <SceneObject key={object.name} object={object} />
-            })}
-
-            <gridHelper />
-            <Galaxy />
-
-            <KeyboardControls
-              map={[
-                { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
-                { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
-                { name: 'right', keys: ['ArrowRight', 'KeyD'] },
-              ]}
-            >
-              <Rocket />
-            </KeyboardControls>
-            <Common color='black' />
-          </Suspense>
-        </View>
-      </div>
-    </>
+    <View orbit={false} className='h-full w-full'>
+      <SceneObject />
+      <Galaxy />
+      <KeyboardControls
+        map={[
+          { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
+          { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
+          { name: 'right', keys: ['ArrowRight', 'KeyD'] },
+        ]}
+      >
+        <Rocket />
+      </KeyboardControls>
+      <Common color='black' />
+    </View>
   )
 }
