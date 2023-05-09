@@ -5,7 +5,7 @@ import { GLTFLoader } from 'three-stdlib'
 import { useLoader } from '@react-three/fiber'
 import { Suspense } from 'react'
 import { Vector3 } from 'three'
-import { KeyboardControls, Html, useProgress } from '@react-three/drei'
+import { KeyboardControls, Html, useProgress, OrbitControls } from '@react-three/drei'
 interface SceneObjectType {
   name: string
   position: Vector3
@@ -58,6 +58,10 @@ const sceneObjects: SceneObjectType[] = [
     children: [{ name: 'tiefighter', position: new THREE.Vector3(30, 0, 10), scale: 1, type: 'ship', children: [] }],
   },
 ]
+
+const YukaVehicle = dynamic(() => import('@/components/canvas/YukaVehicle').then((mod) => mod.YukaVehicle), {
+  ssr: false,
+})
 const Galaxy = dynamic(() => import('@/components/canvas/Galaxy').then((mod) => mod.Galaxy), { ssr: false })
 const Rocket = dynamic(() => import('@/components/canvas/Rocket').then((mod) => mod.Rocket), { ssr: false })
 const SceneObject = dynamic(() => import('@/components/canvas/SceneObject').then((mod) => mod.SceneObject), {
@@ -83,7 +87,6 @@ const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mo
 export default function Page() {
   return (
     <View orbit={false} className='h-full w-full'>
-      <SceneObject />
       <Galaxy />
       <KeyboardControls
         map={[
@@ -94,6 +97,10 @@ export default function Page() {
       >
         <Rocket />
       </KeyboardControls>
+      <SceneObject />
+      <YukaVehicle />
+      <OrbitControls />
+      <gridHelper />
       <Common color='black' />
     </View>
   )

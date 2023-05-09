@@ -1,9 +1,11 @@
 import * as THREE from 'three'
-import { Suspense, useRef, useEffect } from 'react'
-import { useLoader, useFrame } from '@react-three/fiber'
+import { Suspense, useRef, useEffect, useState } from 'react'
+import { useLoader, useFrame, render } from '@react-three/fiber'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { Vector3 } from 'three'
 import { Html, useGLTF, useProgress } from '@react-three/drei'
+import * as YUKA from 'yuka'
+import { argv0 } from 'process'
 interface ObjectPropType {
   position: Vector3
   scale: number
@@ -68,49 +70,45 @@ const sceneObjects: SceneObjectType[] = [
     children: [{ name: 'tiefighter', position: new THREE.Vector3(30, 0, 10), scale: 1, type: 'ship', children: [] }],
   },
 ]
-const satellite = 'satellite'
-const planet = 'planet'
+export const YukaVehicle = () => {
+  const vehicleMesh = useRef(null)
+  const [entityManager, setEntityManager] = useState(new YUKA.EntityManager())
+  useEffect(() => {
+    if (!vehicleMesh) {
+      return
+    }
+    let vehicle = new YUKA.Vehicle()
+    vehicle.maxSpeed = 10
+    vehicleMesh.current.matrixAutoUpdate = false
+    vehicle.setRenderComponent(vehicleMesh.current, sync)
 
-function Loader() {
-  const { active, progress, errors, item, loaded, total } = useProgress()
-  return (
-    <Html style={{ color: 'black', backgroundColor: 'white' }} center>
-      {progress} % loaded
-    </Html>
-  )
-}
-export function SceneObject() {
-  return sceneObjects.map((object) => {
-    return (
-      <Suspense key={object.name} fallback={<Loader />}>
-        <Child object={object} />
-      </Suspense>
-    )
+    const path = new YUKA.Path()
+    path.add(new YUKA.Vector3(-10, 0, 40))
+    path.add(new YUKA.Vector3(-60, 0, 0))
+    path.add(new YUKA.Vector3(-40, 0, -40))
+    path.add(new YUKA.Vector3(0, 0, 0))
+    path.add(new YUKA.Vector3(60, 0, 0))
+    path.add(new YUKA.Vector3(40, 0, 40))
+    path.add(new YUKA.Vector3(0, 0, 60))
+
+    path.loop = true
+    vehicle.position.copy(path.current())
+    const followPathBehavior = new YUKA.FollowPathBehavior(path, 0.5)
+    vehicle.steering.add(followPathBehavior)
+    entityManager.add(vehicle)
+
+    function sync(entity, renderComponent) {
+      renderComponent.matrix.copy(entity.worldMatrix)
+    }
   })
-}
-
-const Child = ({ object }) => {
-  const { position, scale, name, children, type } = object
-  const gltf = useLoader(GLTFLoader, `/${name}.glb`)
-
-  const objectRef = useRef(null)
 
   useFrame((state, delta) => {
-    if (type === planet) {
-      const object = objectRef.current
-      object.rotation.y += 0.001
-    }
-    if (type === satellite) {
-      const object = objectRef.current
-      object.rotation.y += 0.01
-    }
+    entityManager.update(delta)
   })
-
   return (
-    <primitive key={object.name} ref={objectRef} position={position} object={gltf.scene} scale={scale}>
-      {children.map((child: ObjectPropType) => {
-        return <Child key={child.name} object={child} />
-      })}
-    </primitive>
+    <mesh ref={vehicleMesh}>
+      <boxGeometry args={[2, 2, 2]} />
+      <meshBasicMaterial color={'orange'} />
+    </mesh>
   )
 }
