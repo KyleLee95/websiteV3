@@ -16,16 +16,7 @@ export const sceneObjects: SceneObjectType[] = [
     scale: 0.015,
     type: 'planet',
     children: [],
-    waypoints: [
-      {
-        name: 'tgo',
-        position: new THREE.Vector3(2000, 0, 0),
-        scale: 55,
-        type: 'satellite',
-        children: [],
-        waypoints: [],
-      },
-    ],
+    waypoints: [],
   },
   {
     name: 'itokawa',
@@ -74,7 +65,16 @@ export const sceneObjects: SceneObjectType[] = [
     position: new THREE.Vector3(-50, 0, -75),
     scale: 0.025,
     type: 'planet',
-    children: [],
+    children: [
+      {
+        name: 'tgo',
+        position: new THREE.Vector3(2000, 0, 0),
+        scale: 50,
+        type: 'satellite',
+        children: [],
+        waypoints: [],
+      },
+    ],
     waypoints: [],
   },
   { name: 'iss', position: new THREE.Vector3(-20, 0, -10), scale: 0.1, type: 'satellite', children: [], waypoints: [] },

@@ -67,8 +67,9 @@ const Child = ({ object }: PropsObject) => {
   return (
     <group position={[0, 0, 0]}>
       <primitive key={object.name} ref={objectRef} position={position} object={gltf.scene} scale={scale}>
-        {object.children.map((child) => {
-          return <Child key={child.name} object={object} />
+        {object.children.map((child, i) => {
+          const childObject = object.children[i]
+          return <Child key={child.name} object={childObject} asset={object} />
         })}
       </primitive>
     </group>
