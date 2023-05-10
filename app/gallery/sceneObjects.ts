@@ -34,9 +34,9 @@ export const sceneObjects: SceneObjectType[] = [
     position: new THREE.Vector3(-50, 0, -75),
     scale: 0.025,
     type: 'planet',
-    children: [{ name: 'iss', position: new THREE.Vector3(-2000, 0, -75), scale: 3, type: 'satellite', children: [] }],
+    children: [],
   },
-
+  { name: 'iss', position: new THREE.Vector3(-20, 0, -10), scale: 0.1, type: 'satellite', children: [] },
   {
     name: 'swordfish',
     position: new THREE.Vector3(-50, 0, 70),

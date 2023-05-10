@@ -1,6 +1,7 @@
 import * as THREE from 'three'
 import { useRef, useEffect, useState } from 'react'
 import { useLoader, useFrame } from '@react-three/fiber'
+import { Html } from '@react-three/drei'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { Vector3 } from 'three'
 import { sceneObjects } from '@/gallery/sceneObjects'
@@ -33,11 +34,16 @@ export function SceneObject() {
       const sceneAssetsPromises = loader.loadAsync(`/${object.name}.glb`)
       return sceneAssetsPromises
     })
-    const sceneAssets = loadSceneAssets(sceneAssetsToLoad, setAssets)
+    loadSceneAssets(sceneAssetsToLoad, setAssets)
   }, [])
 
   if (!assets) {
-    return null
+    console.log('ran')
+    return (
+      <Html center style={{ color: 'black', background: 'white' }}>
+        Loading...
+      </Html>
+    )
   }
   return assets.map((asset, i) => {
     const object = sceneObjects[i]
