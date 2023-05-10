@@ -100,7 +100,6 @@ export default function Page() {
           <Rocket />
         </KeyboardControls>
         <SceneObject />
-        <YukaVehicle />
         <OrbitControls />
         <gridHelper />
         <Common color='black' />

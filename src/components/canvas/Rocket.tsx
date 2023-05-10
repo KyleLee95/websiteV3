@@ -52,7 +52,6 @@ export function Rocket() {
   //chase camera
   useFrame((state, delta) => {
     const group = rocketGroup.current
-    group.translateY(0.02)
     rocket.current.rotation.y += delta //rotate the rocket for cool animation
     const idealOffset = calculateIdealOffset(group.rotation, group.position)
     const idealLookAt = calculateIdealLookAt(group.rotation, group.position)
