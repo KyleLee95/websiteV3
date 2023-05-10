@@ -3,6 +3,7 @@ import * as THREE from 'three'
 import dynamic from 'next/dynamic'
 import { Vector3 } from 'three'
 import { KeyboardControls, Html, useProgress, OrbitControls } from '@react-three/drei'
+import { Suspense } from 'react'
 interface SceneObjectType {
   name: string
   position: Vector3
@@ -83,22 +84,24 @@ const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mo
 
 export default function Page() {
   return (
-    <View orbit={false} className='h-full w-full'>
-      <Galaxy />
-      <KeyboardControls
-        map={[
-          { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
-          { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
-          { name: 'right', keys: ['ArrowRight', 'KeyD'] },
-        ]}
-      >
-        <Rocket />
-      </KeyboardControls>
-      <SceneObject />
-      <YukaVehicle />
-      <OrbitControls />
-      <gridHelper />
-      <Common color='black' />
-    </View>
+    <Suspense fallback={null}>
+      <View orbit={false} className='h-full w-full'>
+        <Galaxy />
+        <KeyboardControls
+          map={[
+            { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
+            { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
+            { name: 'right', keys: ['ArrowRight', 'KeyD'] },
+          ]}
+        >
+          <Rocket />
+        </KeyboardControls>
+        <SceneObject />
+        <YukaVehicle />
+        <OrbitControls />
+        <gridHelper />
+        <Common color='black' />
+      </View>
+    </Suspense>
   )
 }
