@@ -13,8 +13,9 @@ export const sceneObjects: SceneObjectType[] = [
     position: new THREE.Vector3(50, 5, 0),
     scale: 0.015,
     type: 'planet',
-    children: [{ name: 'tgo', position: new THREE.Vector3(2000, 0, 0), scale: 55, type: 'satellite', children: [] }],
+    children: [],
   },
+  { name: 'tgo', position: new THREE.Vector3(2000, 0, 0), scale: 55, type: 'satellite', children: [] },
   { name: 'itokawa', position: new THREE.Vector3(-30, 0, -30), scale: 0.0025, type: 'satellite', children: [] },
   {
     name: 'titan',
@@ -41,14 +42,17 @@ export const sceneObjects: SceneObjectType[] = [
     position: new THREE.Vector3(-50, 0, 70),
     scale: 1,
     type: 'ship',
-    children: [{ name: 'redtail', position: new THREE.Vector3(-10, 0, 10), scale: 1, type: 'ship', children: [] }],
+    children: [],
   },
+
+  { name: 'redtail', position: new THREE.Vector3(-10, 0, 10), scale: 1, type: 'ship', children: [] },
 
   {
     name: 'mandalorian',
     position: new THREE.Vector3(30, 0, 70),
     scale: 1,
     type: 'ship',
-    children: [{ name: 'tiefighter', position: new THREE.Vector3(30, 0, 10), scale: 1, type: 'ship', children: [] }],
+    children: [],
   },
+  { name: 'tiefighter', position: new THREE.Vector3(30, 0, 10), scale: 1, type: 'ship', children: [] },
 ]

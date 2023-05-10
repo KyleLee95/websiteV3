@@ -1,9 +1,6 @@
 'use client'
 import * as THREE from 'three'
 import dynamic from 'next/dynamic'
-import { GLTFLoader } from 'three-stdlib'
-import { useLoader } from '@react-three/fiber'
-import { Suspense } from 'react'
 import { Vector3 } from 'three'
 import { KeyboardControls, Html, useProgress, OrbitControls } from '@react-three/drei'
 interface SceneObjectType {
