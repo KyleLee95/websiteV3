@@ -17,6 +17,7 @@ interface ObjectPropType {
 
 interface PropsObject {
   object: ObjectPropType
+  parent?: ObjectPropType
   asset: any
 }
 
@@ -61,59 +62,66 @@ export function SceneObject() {
 const Child = ({ object }: PropsObject) => {
   const { position, scale, name, type } = object
   const gltf = useGLTF(`/${name}.glb`)
-
   const objectRef = useRef(null)
+
+  useFrame((state, delta) => {
+    //add a nice little rotation for each planet
+    if (type === planet) {
+      objectRef.current.rotation.y += delta / 30
+    }
+  })
   //we return the children as a group bceause it anchors the loading state HTML to world [0,0,0]. Othewise the div will drift with the meshes
   return (
-    <group position={[0, 0, 0]}>
-      <primitive key={object.name} ref={objectRef} position={position} object={gltf.scene} scale={scale}>
-        {object.children.map((child, i) => {
-          const childObject = object.children[i]
-          return <Child key={child.name} object={childObject} asset={object} />
-        })}
-      </primitive>
-    </group>
+    <primitive key={object.name} ref={objectRef} position={position} object={gltf.scene} scale={scale}>
+      {object.children.map((child, i) => {
+        const childObject = object.children[i]
+        return <Child key={child.name} object={childObject} asset={object} />
+      })}
+    </primitive>
   )
 }
-/*
- * TODO:
- * Array<YUKA Vector>Yuka vectors as props
- * Chase followPathBehavior
- *
- */
-const AnimatedChild = ({ object }: PropsObject) => {
+const AnimatedChild = ({ object, parent }: PropsObject) => {
   const { position, scale, name, waypoints, type } = object
   const gltf = useGLTF(`/${name}.glb`)
 
   const vehicleMesh = useRef(null)
   const [entityManager, setEntityManager] = useState(new YUKA.EntityManager())
+  const [yukaVehicle, setYukaVehicle] = useState(new YUKA.Vehicle())
   useEffect(() => {
+    //early return if the ref hasn't been set yet
     if (!vehicleMesh) {
       return
     }
-    let vehicle = new YUKA.Vehicle()
-    vehicle.maxSpeed = 50
-    vehicleMesh.current.matrixAutoUpdate = false
-    vehicle.setRenderComponent(vehicleMesh.current, sync)
 
-    const path = new YUKA.Path()
-    waypoints.forEach((waypoint) => {
-      path.add(waypoint)
-    })
-    // path.add(new YUKA.Vector3(-10, -45, 40))
-    // path.add(new YUKA.Vector3(-60, 12, 0))
-    // path.add(new YUKA.Vector3(-40, -30, -40))
-    // path.add(new YUKA.Vector3(0, -80, -20))
-    // path.add(new YUKA.Vector3(60, 90, 0))
-    // path.add(new YUKA.Vector3(40, 100, 40))
-    // path.add(new YUKA.Vector3(0, 10, 60))
-    if (waypoints.length > 0) {
+    //handle cases with custom behavior
+    if (name === 'mandalorian') {
+      vehicleMesh.current.children[0].rotateZ(-Math.PI / 2)
+    }
+    if (parent) {
+      vehicleMesh.current.matrixAutoUpdate = false
+      yukaVehicle.maxSpeed = 50
+      yukaVehicle.position.z = -5
+      yukaVehicle.setRenderComponent(vehicleMesh.current, sync)
+      const pursuitBehavior = new YUKA.PursuitBehavior(parent, 2)
+      yukaVehicle.steering.add(pursuitBehavior)
+
+      entityManager.add(yukaVehicle)
+    } else if (waypoints.length > 0) {
+      yukaVehicle.maxSpeed = 50
+      vehicleMesh.current.matrixAutoUpdate = false
+      yukaVehicle.setRenderComponent(vehicleMesh.current, sync)
+
+      const path = new YUKA.Path()
+      waypoints.forEach((waypoint) => {
+        path.add(waypoint)
+      })
       path.loop = true
 
-      vehicle.position.copy(path.current())
+      yukaVehicle.position.copy(path.current())
+
       const followPathBehavior = new YUKA.FollowPathBehavior(path, 1)
-      vehicle.steering.add(followPathBehavior)
-      entityManager.add(vehicle)
+      yukaVehicle.steering.add(followPathBehavior)
+      entityManager.add(yukaVehicle)
     }
 
     function sync(entity, renderComponent) {
@@ -126,6 +134,13 @@ const AnimatedChild = ({ object }: PropsObject) => {
   })
 
   return (
-    <primitive key={object.name} ref={vehicleMesh} position={position} object={gltf.scene} scale={scale}></primitive>
+    <group>
+      <primitive key={object.name} ref={vehicleMesh} position={position} object={gltf.scene} scale={scale}></primitive>
+      {object.children.map((child) => {
+        //pass the instace of the yuka vehicle to the child so that it can be pursued.
+        //TODO: Should also pass a boolean to state that it should be a pursuit or not
+        return <AnimatedChild parent={yukaVehicle} key={object.name} object={child} asset={child} />
+      })}
+    </group>
   )
 }

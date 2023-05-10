@@ -19,14 +19,6 @@ export const sceneObjects: SceneObjectType[] = [
     waypoints: [],
   },
   {
-    name: 'itokawa',
-    position: new THREE.Vector3(-30, 0, -30),
-    scale: 0.0025,
-    type: 'satellite',
-    children: [],
-    waypoints: [],
-  },
-  {
     name: 'titan',
     position: new THREE.Vector3(-100, 0, 0),
     scale: 0.015,
@@ -49,7 +41,16 @@ export const sceneObjects: SceneObjectType[] = [
     position: new THREE.Vector3(-100, 0, -300),
     scale: 0.025,
     type: 'planet',
-    children: [],
+    children: [
+      {
+        name: 'itokawa',
+        position: new THREE.Vector3(200, 0, -30),
+        scale: 10,
+        type: 'satellite',
+        children: [],
+        waypoints: [],
+      },
+    ],
     waypoints: [],
   },
   {
@@ -68,8 +69,8 @@ export const sceneObjects: SceneObjectType[] = [
     children: [
       {
         name: 'tgo',
-        position: new THREE.Vector3(2000, 0, 0),
-        scale: 50,
+        position: new THREE.Vector3(1200, 0, 0),
+        scale: 45,
         type: 'satellite',
         children: [],
         waypoints: [],
@@ -83,7 +84,9 @@ export const sceneObjects: SceneObjectType[] = [
     position: new THREE.Vector3(-50, 0, 70),
     scale: 1,
     type: 'ship',
-    children: [],
+    children: [
+      { name: 'redtail', position: new THREE.Vector3(-10, 0, 10), scale: 1, type: 'ship', children: [], waypoints: [] },
+    ],
     waypoints: [
       new YV3(-100, 0, -50),
       new YV3(-200, 0, -50),
@@ -93,15 +96,27 @@ export const sceneObjects: SceneObjectType[] = [
     ],
   },
 
-  { name: 'redtail', position: new THREE.Vector3(-10, 0, 10), scale: 1, type: 'ship', children: [], waypoints: [] },
-
   {
     name: 'mandalorian',
-    position: new THREE.Vector3(30, 0, 70),
+    position: new THREE.Vector3(0, 0, 0),
     scale: 1,
     type: 'ship',
-    children: [],
-    waypoints: [],
+    children: [
+      {
+        name: 'tiefighter',
+        position: new THREE.Vector3(0, 0, 0),
+        scale: 1,
+        type: 'ship',
+        children: [],
+        waypoints: [],
+      },
+    ],
+    waypoints: [
+      new YV3(0, 0, 50),
+      new YV3(-200, 0, 50),
+      new YV3(200, 0, -100),
+      new YV3(100, 0, -100),
+      new YV3(0, 0, 0),
+    ],
   },
-  { name: 'tiefighter', position: new THREE.Vector3(30, 0, 10), scale: 1, type: 'ship', children: [], waypoints: [] },
 ]
