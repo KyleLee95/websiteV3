@@ -83,8 +83,7 @@ const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.
 const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mod.Common), { ssr: false })
 const Loader = () => {
   const { progress } = useProgress()
-
-  return <Html>{progress} % loaded</Html>
+  return <Html style={{ background: 'white', color: 'black' }}>{progress} % loaded</Html>
 }
 export default function Page() {
   return (

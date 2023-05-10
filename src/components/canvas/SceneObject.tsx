@@ -1,7 +1,7 @@
 import * as THREE from 'three'
-import { useRef, useEffect, useState } from 'react'
+import { useRef, useEffect, useState, Suspense } from 'react'
 import { useLoader, useFrame } from '@react-three/fiber'
-import { Html } from '@react-three/drei'
+import { Html, useGLTF, useProgress } from '@react-three/drei'
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
 import { Vector3 } from 'three'
 import { sceneObjects } from '@/gallery/sceneObjects'
@@ -21,53 +21,30 @@ interface PropsObject {
 const satellite = 'satellite'
 const planet = 'planet'
 
-async function loadSceneAssets(sceneAssetsToLoad: Array<Promise<Object>>, setter: Function) {
-  const sceneAssets = await Promise.all(sceneAssetsToLoad)
-  setter(sceneAssets)
-  return sceneAssets
+const Loader = () => {
+  const { progress } = useProgress()
+  return (
+    <Html fullscreen style={{ color: 'black', background: 'white', textAlign: 'center' }}>
+      {progress} % loaded
+    </Html>
+  )
 }
 export function SceneObject() {
-  const [assets, setAssets] = useState(null)
-  useEffect(() => {
-    const sceneAssetsToLoad = sceneObjects.map((object) => {
-      const loader = new GLTFLoader()
-      const sceneAssetsPromises = loader.loadAsync(`/${object.name}.glb`)
-      return sceneAssetsPromises
-    })
-    loadSceneAssets(sceneAssetsToLoad, setAssets)
-  }, [])
-
-  if (!assets) {
-    console.log('ran')
-    return (
-      <Html center style={{ color: 'black', background: 'white' }}>
-        Loading...
-      </Html>
-    )
-  }
-  return assets.map((asset, i) => {
-    const object = sceneObjects[i]
-    return <Child key={object.name} object={object} asset={asset} />
-  })
+  return (
+    <Suspense fallback={<Loader />}>
+      {sceneObjects.map((asset, i) => {
+        const object = sceneObjects[i]
+        return <Child key={object.name} object={object} asset={asset} />
+      })}
+    </Suspense>
+  )
 }
 
-const Child = ({ object, asset }: PropsObject) => {
+const Child = ({ object }: PropsObject) => {
   const { position, scale, name, type } = object
-  const { scene } = asset
-  // const gltf = useLoader(GLTFLoader, `/${name}.glb`)
+  const gltf = useGLTF(`/${name}.glb`)
 
   const objectRef = useRef(null)
 
-  // useFrame((state, delta) => {
-  //   if (type === planet) {
-  //     const object = objectRef.current
-  //     object.rotation.y += 0.001
-  //   }
-  //   if (type === satellite) {
-  //     const object = objectRef.current
-  //     object.rotation.y += 0.01
-  //   }
-  // })
-
-  return <primitive key={object.name} ref={objectRef} position={position} object={scene} scale={scale}></primitive>
+  return <primitive key={object.name} ref={objectRef} position={position} object={gltf.scene} scale={scale}></primitive>
 }
