@@ -63,21 +63,26 @@ const Child = ({ object }: PropsObject) => {
   const { position, scale, name, type } = object
   const gltf = useGLTF(`/${name}.glb`)
   const objectRef = useRef(null)
-
   useFrame((state, delta) => {
     //add a nice little rotation for each planet
     if (type === planet) {
       objectRef.current.rotation.y += delta / 30
     }
   })
-  //we return the children as a group bceause it anchors the loading state HTML to world [0,0,0]. Othewise the div will drift with the meshes
   return (
-    <primitive key={object.name} ref={objectRef} position={position} object={gltf.scene} scale={scale}>
-      {object.children.map((child, i) => {
-        const childObject = object.children[i]
-        return <Child key={child.name} object={childObject} asset={object} />
-      })}
-    </primitive>
+    <>
+      <primitive visible={true} key={object.name} ref={objectRef} position={position} object={gltf.scene} scale={scale}>
+        {object.children.map((child, i) => {
+          const childObject = object.children[i]
+          return <Child key={child.name} object={childObject} asset={object} />
+        })}
+      </primitive>
+
+      <mesh scale={3} visible={false} position={position}>
+        <boxGeometry args={[11, 11, 11]}></boxGeometry>
+        <meshBasicMaterial color='orange' />
+      </mesh>
+    </>
   )
 }
 const AnimatedChild = ({ object, parent }: PropsObject) => {
