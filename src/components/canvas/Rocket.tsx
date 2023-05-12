@@ -18,7 +18,8 @@ const calculateIdealOffset = (rotation: THREE.Euler, position: THREE.Vector3) =>
   return idealOffset
 }
 
-export function Rocket() {
+export function Rocket(props) {
+  const { rocketBB } = props
   const rocketGroup = useRef(null)
   const rocket = useRef(null)
   const three = useThree()
@@ -68,6 +69,11 @@ export function Rocket() {
   return (
     <group ref={rocketGroup}>
       <primitive ref={rocket} position={[0, 0, 0]} object={gltf.scene} scale={1}></primitive>
+
+      <mesh ref={rocketBB}>
+        <boxGeometry args={[10, 10, 10]} />
+        <meshBasicMaterial color='orange' />
+      </mesh>
     </group>
   )
 }

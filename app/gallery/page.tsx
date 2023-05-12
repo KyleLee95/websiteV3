@@ -3,7 +3,7 @@ import * as THREE from 'three'
 import dynamic from 'next/dynamic'
 import { Vector3 } from 'three'
 import { KeyboardControls, Html, useProgress, OrbitControls } from '@react-three/drei'
-import { Suspense } from 'react'
+import { Suspense, useRef } from 'react'
 interface SceneObjectType {
   name: string
   position: Vector3
@@ -85,7 +85,10 @@ const Loader = () => {
   const { progress } = useProgress()
   return <Html style={{ background: 'white', color: 'black' }}>{progress} % loaded</Html>
 }
+
 export default function Page() {
+  const rocketBB = useRef()
+
   return (
     <Suspense fallback={<Loader />}>
       <View orbit={false} className='h-full w-full'>
@@ -97,9 +100,9 @@ export default function Page() {
             { name: 'right', keys: ['ArrowRight', 'KeyD'] },
           ]}
         >
-          <Rocket />
+          <Rocket rocketBB={rocketBB} />
         </KeyboardControls>
-        <SceneObject />
+        <SceneObject rocketBB={rocketBB} />
         <OrbitControls />
         <gridHelper />
         <Common color='black' />

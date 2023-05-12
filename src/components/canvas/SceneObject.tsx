@@ -1,10 +1,11 @@
 import * as THREE from 'three'
 import * as YUKA from 'yuka'
-import { useRef, useState, useEffect, Suspense } from 'react'
+import { useRef, useState, useEffect, Suspense, Ref } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Html, useGLTF, useProgress } from '@react-three/drei'
 import { Vector3 } from 'three'
 import { sceneObjects } from '@/gallery/sceneObjects'
+import { argv0 } from 'process'
 
 interface ObjectPropType {
   position: Vector3
@@ -19,6 +20,7 @@ interface PropsObject {
   object: ObjectPropType
   parent?: ObjectPropType
   asset: any
+  rocketBB?: Ref<THREE.Mesh>
 }
 
 const satellite = 'satellite'
@@ -45,7 +47,8 @@ const Loader = () => {
     </Html>
   )
 }
-export function SceneObject() {
+export function SceneObject(props) {
+  const { rocketBB } = props
   return (
     <Suspense fallback={<Loader />}>
       {sceneObjects.map((asset, i) => {
@@ -53,31 +56,66 @@ export function SceneObject() {
         if (object.type === 'ship') {
           return <AnimatedChild key={object.name} object={object} asset={asset} />
         }
-        return <Child key={object.name} object={object} asset={asset} />
+        return <Child rocketBB={rocketBB} key={object.name} object={object} asset={asset} />
       })}
     </Suspense>
   )
 }
 
-const Child = ({ object }: PropsObject) => {
+const Child = ({ object, rocketBB }: PropsObject) => {
   const { position, scale, name, type } = object
   const gltf = useGLTF(`/${name}.glb`)
   const objectRef = useRef(null)
-
+  const childBB = useRef(null)
+  const childBox = new THREE.Box3()
+  let box = new THREE.Box3()
+  // useEffect(() => {
+  //   if (rocketBB.current) {
+  //     rocketBB.current.geometry.computeBoundingBox()
+  //
+  //     childBB.current.geometry.computeBoundingBox()
+  //   }
+  // }, [rocketBB])
   useFrame((state, delta) => {
     //add a nice little rotation for each planet
+    rocketBB.current.geometry.computeBoundingBox()
+
+    childBB.current.geometry.computeBoundingBox()
     if (type === planet) {
       objectRef.current.rotation.y += delta / 30
     }
+
+    if (rocketBB.current.geometry.boundingBox) {
+      box.copy(rocketBB.current.geometry.boundingBox).applyMatrix4(rocketBB.current.matrixWorld)
+
+      childBox.copy(childBB.current.geometry.boundingBox).applyMatrix4(childBB.current.matrixWorld)
+    }
+
+    //if it intersects
+    const intersects = box.intersectsBox(childBox)
+    console.log('intersects', intersects)
+    if (intersects) {
+      console.log(childBB.current)
+      childBB.current.material.color = new THREE.Color(1, 0, 0)
+    } else {
+      childBB.current.material.color = new THREE.Color(0, 0, 1)
+    }
   })
+
   //we return the children as a group bceause it anchors the loading state HTML to world [0,0,0]. Othewise the div will drift with the meshes
   return (
-    <primitive key={object.name} ref={objectRef} position={position} object={gltf.scene} scale={scale}>
-      {object.children.map((child, i) => {
-        const childObject = object.children[i]
-        return <Child key={child.name} object={childObject} asset={object} />
-      })}
-    </primitive>
+    <>
+      <mesh position={position} ref={childBB} scale={1}>
+        <primitive key={object.name} ref={objectRef} object={gltf.scene} scale={scale}>
+          {object.children.map((child, i) => {
+            const childObject = object.children[i]
+            return <Child rocketBB={rocketBB} key={child.name} object={childObject} asset={object} />
+          })}
+        </primitive>
+        <meshBasicMaterial color={'blue'} transparent={true} opacity={0.5} />
+        <boxGeometry args={[20, 20, 20]}></boxGeometry>
+      </mesh>
+    </>
   )
 }
 const AnimatedChild = ({ object, parent }: PropsObject) => {
@@ -135,6 +173,10 @@ const AnimatedChild = ({ object, parent }: PropsObject) => {
 
   return (
     <group>
+      <mesh>
+        <boxGeometry args={[5, 5, 5]} />
+        <meshBasicMaterial color='blue' />
+      </mesh>
       <primitive key={object.name} ref={vehicleMesh} position={position} object={gltf.scene} scale={scale}></primitive>
       {object.children.map((child) => {
         //pass the instace of the yuka vehicle to the child so that it can be pursued.
