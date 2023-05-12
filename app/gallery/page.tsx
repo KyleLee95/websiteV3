@@ -2,6 +2,7 @@
 import dynamic from 'next/dynamic'
 import { KeyboardControls, Html, useProgress, OrbitControls } from '@react-three/drei'
 import { useRef, Suspense } from 'react'
+import { Physics } from '@react-three/rapier'
 const Galaxy = dynamic(() => import('@/components/canvas/Galaxy').then((mod) => mod.Galaxy), { ssr: false })
 const Rocket = dynamic(() => import('@/components/canvas/Rocket').then((mod) => mod.Rocket), { ssr: false })
 const SceneObject = dynamic(() => import('@/components/canvas/SceneObject').then((mod) => mod.SceneObject), {
@@ -32,20 +33,22 @@ export default function Page() {
   return (
     <Suspense fallback={<Loader />}>
       <View orbit={false} className='h-full w-full'>
-        <Galaxy />
-        <KeyboardControls
-          map={[
-            { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
-            { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
-            { name: 'right', keys: ['ArrowRight', 'KeyD'] },
-          ]}
-        >
-          <Rocket />
-        </KeyboardControls>
-        <SceneObject />
-        <OrbitControls />
-        <gridHelper />
-        <Common color='black' />
+        <Physics gravity={[0, 0, 0]} debug>
+          <Galaxy />
+          <KeyboardControls
+            map={[
+              { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
+              { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
+              { name: 'right', keys: ['ArrowRight', 'KeyD'] },
+            ]}
+          >
+            <Rocket />
+          </KeyboardControls>
+          <SceneObject />
+          <OrbitControls />
+          <gridHelper />
+          <Common color='black' />
+        </Physics>
       </View>
     </Suspense>
   )
