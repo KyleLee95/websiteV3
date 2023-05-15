@@ -16,7 +16,7 @@ const calculateIdealLookAt = (rotation: THREE.Euler, position: THREE.Vector3) =>
   return idealLookAt
 }
 const calculateIdealOffset = (rotation: THREE.Euler, position: THREE.Vector3) => {
-  const idealOffset = new THREE.Vector3(0, -55, 70)
+  const idealOffset = new THREE.Vector3(0, 55, 70)
   idealOffset.applyEuler(rotation)
   idealOffset.add(position)
   return idealOffset
@@ -26,17 +26,14 @@ export function Rocket() {
   const rocketGroup = useRef(null)
   const rocket = useRef(null)
   const rigidBody = useRef(null)
-  const three = useThree()
+  const collider = useRef(null)
+  const { clock } = useThree()
+  const elapsedTime = clock.elapsedTime
+  const currPosition = new THREE.Vector3()
+  const currLookAt = new THREE.Vector3()
 
-  const refState = useRef({
-    grounded: false,
-    jumping: false,
-    velocity: vec3(),
-  })
-  const controller = useRef<KinematicCharacterController>()
   const rapier = useRapier()
 
-  const collider = useRef<RapierCollider>(null)
   const [subscribeKeys, getKeys] = useKeyboardControls()
   // //init controller
   useEffect(() => {
@@ -45,27 +42,55 @@ export function Rocket() {
 
   useFrame((state, delta) => {
     const { forward, left, right } = getKeys()
-    try {
-      if (forward) {
-        rocketGroup.current.translateZ(-0.5)
-        rigidBody.current.setTranslation(rocketGroup.current.position, true)
-      }
-      if (left) {
-        rocketGroup.current.rotateY(Math.PI / 100)
-      }
-      if (right) {
-        rocketGroup.current.rotateY(-Math.PI / 100)
-      }
-    } catch (err) {}
+
+    const impulse = { x: 0, y: 0, z: 0 }
+    if (forward) {
+      rigidBody.current.setRotation({ w: 1, x: 0, y: 0, z: 0 }, true)
+      // console.log(rigidBody.current.rotation)
+    }
+    if (left) {
+      // rocketGroup.current.rotateY(Math.PI / 100)
+      rigidBody.current.setAngvel({ x: 0.0, y: 1, z: 0.0 })
+      //      rigidBody.current.setRotation({ w: 1, x: 0, y: 0, z: -1 }, true)
+    }
+    if (right) {
+      // rocketGroup.current.rotateY(-Math.PI / 100)
+
+      rigidBody.current.setRotation({ w: 1, x: 0, y: 0, z: 1 }, true)
+    }
+
+    rigidBody.current.applyImpulse({ x: 0.0, y: 0.0, z: -1.0 }, true)
+  })
+
+  //chase camera
+  useFrame((state, delta) => {
+    const group = rocketGroup.current
+    rocket.current.rotation.y += delta //rotate the rocket for cool animation
+    const idealOffset = calculateIdealOffset(group.rotation, group.position)
+    const idealLookAt = calculateIdealLookAt(group.rotation, group.position)
+    //lerping makes camera movement independent of the frame rate
+    const lerpSmoothingCoefficient = Math.pow(0.001, elapsedTime)
+    currPosition.lerp(idealOffset, lerpSmoothingCoefficient)
+    currLookAt.lerp(idealLookAt, lerpSmoothingCoefficient)
+    state.camera.position.copy(currPosition)
+    state.camera.lookAt(currLookAt)
   })
 
   const gltf = useLoader(GLTFLoader, '/rocket.glb')
 
   return (
-    <RigidBody ref={rigidBody} args={[1, 1, 1]} colliders='cuboid' type='dynamic'>
-      <group ref={rocketGroup}>
+    <RigidBody ref={rigidBody} enabledRotations={[false, false, false]}>
+      <CuboidCollider
+        args={[2, 1, 1]}
+        ref={collider}
+        sensor
+        onCollisionEnter={() => {
+          console.log('contact')
+        }}
+      />
+      <mesh ref={rocketGroup}>
         <primitive ref={rocket} position={[0, 0, 0]} object={gltf.scene} scale={1}></primitive>
-      </group>
+      </mesh>
     </RigidBody>
   )
 }

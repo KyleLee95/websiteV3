@@ -5,6 +5,7 @@ import { useFrame } from '@react-three/fiber'
 import { Html, useGLTF, useProgress } from '@react-three/drei'
 import { Vector3 } from 'three'
 import { sceneObjects } from '@/gallery/sceneObjects'
+import { RigidBody } from '@react-three/rapier'
 
 interface ObjectPropType {
   position: Vector3
@@ -71,17 +72,26 @@ const Child = ({ object }: PropsObject) => {
   })
   return (
     <>
-      <primitive visible={true} key={object.name} ref={objectRef} position={position} object={gltf.scene} scale={scale}>
-        {object.children.map((child, i) => {
-          const childObject = object.children[i]
-          return <Child key={child.name} object={childObject} asset={object} />
-        })}
-      </primitive>
+      <RigidBody type='fixed' colliders='cuboid'>
+        <primitive
+          visible={true}
+          key={object.name}
+          ref={objectRef}
+          position={position}
+          object={gltf.scene}
+          scale={scale}
+        >
+          {object.children.map((child, i) => {
+            const childObject = object.children[i]
+            return <Child key={child.name} object={childObject} asset={object} />
+          })}
+        </primitive>
 
-      <mesh scale={3} visible={false} position={position}>
-        <boxGeometry args={[11, 11, 11]}></boxGeometry>
-        <meshBasicMaterial color='orange' />
-      </mesh>
+        <mesh scale={3} visible={false} position={position}>
+          <boxGeometry args={[11, 11, 11]}></boxGeometry>
+          <meshBasicMaterial color='orange' />
+        </mesh>
+      </RigidBody>
     </>
   )
 }
