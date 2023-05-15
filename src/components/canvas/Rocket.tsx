@@ -39,57 +39,22 @@ export function Rocket() {
   const collider = useRef<RapierCollider>(null)
   const [subscribeKeys, getKeys] = useKeyboardControls()
   // //init controller
-  // useEffect(() => {
-  //   const c = rapier.world.raw().createCharacterController(0.1)
-  //   c.setApplyImpulsesToDynamicBodies(true)
-  //   c.setCharacterMass(0.2)
-  //   c.enableSnapToGround(0.02)
-  //   controller.current = c
-  //   rocket.current.rotateX(-Math.PI / 2)
-  // }, [rapier])
+  useEffect(() => {
+    rocket.current.rotateX(-Math.PI / 2)
+  }, [rapier])
 
   useFrame((state, delta) => {
     const { forward, left, right } = getKeys()
     try {
-      // const position = vec3(rigidBody.current.translation())
-      // const rotation = quat(rigidBody.current.rotation())
-      // const eulerRot = euler().setFromQuaternion(quat(rigidBody.current.rotation()))
-      // const idealLookAt = calculateIdealLookAt(eulerRot, position)
-      // const idealOffset = calculateIdealOffset(eulerRot, position)
-      // const movement = vec3()
-
-      const impulse = { x: 0, y: 0, z: 0 }
-      const torque = { x: 0, y: 0, z: 0 }
-      let rotate = false
-      const impulseStrength = 3
-      const torqueStrength = 0.2 * delta
       if (forward) {
-        impulse.z -= impulseStrength
-        rotate = true
-        console.log('here')
+        rocketGroup.current.translateZ(-0.5)
+        rigidBody.current.setTranslation(rocketGroup.current.position, true)
       }
       if (left) {
-        impulse.x -= impulseStrength
-        rotate = true
+        rocketGroup.current.rotateY(Math.PI / 100)
       }
       if (right) {
-        impulse.x += impulseStrength
-        rotate = true
-      }
-
-      rigidBody.current.applyImpulse(impulse)
-      // movement.add(velocity)
-      // controller.current.computeColliderMovement(collider.current, movement)
-      // refState.current.grounded = controller.current.computedGrounded()
-      // let correctedMovement = controller.current.computedMovement()
-      // position.add(vec3(correctedMovement))
-      // rigidBody.current.setNextKinematicTranslation(position)
-      // rigidBody.current.setNextKinematicRotation(rotation)
-      //      console.log(rigidBody.current.linvel())
-      if (rotate) {
-        const linvel = rigidBody.current.linvel()
-        const angle = Math.atan2(linvel.x, linvel.z)
-        rigidBody.current.rotation.y = angle
+        rocketGroup.current.rotateY(-Math.PI / 100)
       }
     } catch (err) {}
   })
@@ -97,7 +62,7 @@ export function Rocket() {
   const gltf = useLoader(GLTFLoader, '/rocket.glb')
 
   return (
-    <RigidBody ref={rigidBody} colliders='cuboid'>
+    <RigidBody ref={rigidBody} args={[1, 1, 1]} colliders='cuboid' type='dynamic'>
       <group ref={rocketGroup}>
         <primitive ref={rocket} position={[0, 0, 0]} object={gltf.scene} scale={1}></primitive>
       </group>
