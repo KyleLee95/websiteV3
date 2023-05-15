@@ -4,6 +4,7 @@ import dynamic from 'next/dynamic'
 import { Vector3 } from 'three'
 import { KeyboardControls, Html, useProgress, OrbitControls } from '@react-three/drei'
 import { Suspense, useRef } from 'react'
+import { Physics, usePlane, useBox } from '@react-three/cannon'
 interface SceneObjectType {
   name: string
   position: Vector3
