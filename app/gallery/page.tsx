@@ -63,6 +63,7 @@ const YukaVehicle = dynamic(() => import('@/components/canvas/YukaVehicle').then
 })
 const Galaxy = dynamic(() => import('@/components/canvas/Galaxy').then((mod) => mod.Galaxy), { ssr: false })
 
+const TestPlane = dynamic(() => import('@/components/canvas/TestPlane').then((mod) => mod.TestPlane), { ssr: false })
 const TestBox = dynamic(() => import('@/components/canvas/TestBox').then((mod) => mod.TestBox), { ssr: false })
 const Rocket = dynamic(() => import('@/components/canvas/Rocket').then((mod) => mod.Rocket), { ssr: false })
 const SceneObject = dynamic(() => import('@/components/canvas/SceneObject').then((mod) => mod.SceneObject), {
@@ -99,12 +100,13 @@ export default function Page() {
           <Debug scale={1.2} color='red'>
             <KeyboardControls
               map={[
-                { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
+                { name: 'up', keys: ['ArrowUp', 'KeyW'] },
                 { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
                 { name: 'right', keys: ['ArrowRight', 'KeyD'] },
               ]}
             >
               <TestBox />
+              <TestPlane />
             </KeyboardControls>
             <SceneObject rocketBB={rocketBB} />
           </Debug>
