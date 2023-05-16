@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic'
 import { Vector3 } from 'three'
 import { KeyboardControls, Html, useProgress, OrbitControls } from '@react-three/drei'
 import { Suspense, useRef } from 'react'
-import { Physics, usePlane, useBox } from '@react-three/cannon'
+import { Physics, usePlane, useBox, Debug } from '@react-three/cannon'
 interface SceneObjectType {
   name: string
   position: Vector3
@@ -62,6 +62,8 @@ const YukaVehicle = dynamic(() => import('@/components/canvas/YukaVehicle').then
   ssr: false,
 })
 const Galaxy = dynamic(() => import('@/components/canvas/Galaxy').then((mod) => mod.Galaxy), { ssr: false })
+
+const TestBox = dynamic(() => import('@/components/canvas/TestBox').then((mod) => mod.TestBox), { ssr: false })
 const Rocket = dynamic(() => import('@/components/canvas/Rocket').then((mod) => mod.Rocket), { ssr: false })
 const SceneObject = dynamic(() => import('@/components/canvas/SceneObject').then((mod) => mod.SceneObject), {
   ssr: false,
@@ -93,21 +95,28 @@ export default function Page() {
   return (
     <Suspense fallback={<Loader />}>
       <View orbit={false} className='h-full w-full'>
-        <Galaxy />
-        <KeyboardControls
-          map={[
-            { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
-            { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
-            { name: 'right', keys: ['ArrowRight', 'KeyD'] },
-          ]}
-        >
-          <Rocket rocketBB={rocketBB} />
-        </KeyboardControls>
-        <SceneObject rocketBB={rocketBB} />
-        <OrbitControls />
-        <gridHelper />
-        <Common color='black' />
+        <Physics>
+          <Debug scale={1.2} color='red'>
+            <KeyboardControls
+              map={[
+                { name: 'forward', keys: ['ArrowUp', 'KeyW'] },
+                { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
+                { name: 'right', keys: ['ArrowRight', 'KeyD'] },
+              ]}
+            >
+              <TestBox />
+            </KeyboardControls>
+            <SceneObject rocketBB={rocketBB} />
+          </Debug>
+          <OrbitControls />
+          <gridHelper />
+          <Common color='black' />
+        </Physics>
       </View>
     </Suspense>
   )
 }
+
+// <Galaxy />
+//
+//   <Rocket rocketBB={rocketBB} />

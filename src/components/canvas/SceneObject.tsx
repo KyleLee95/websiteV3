@@ -78,46 +78,48 @@ const Child = ({ object, rocketBB }: PropsObject) => {
   // }, [rocketBB])
   useFrame((state, delta) => {
     //add a nice little rotation for each planet
-    rocketBB.current.geometry.computeBoundingBox()
-
-    childBB.current.geometry.computeBoundingBox()
-    if (type === planet) {
-      objectRef.current.rotation.y += delta / 30
-    }
-
-    if (rocketBB.current.geometry.boundingBox) {
-      box.copy(rocketBB.current.geometry.boundingBox).applyMatrix4(rocketBB.current.matrixWorld)
-
-      childBox.copy(childBB.current.geometry.boundingBox).applyMatrix4(childBB.current.matrixWorld)
-    }
-
-    //if it intersects
-    const intersects = box.intersectsBox(childBox)
-    console.log('intersects', intersects)
-    if (intersects) {
-      console.log(childBB.current)
-      childBB.current.material.color = new THREE.Color(1, 0, 0)
-    } else {
-      childBB.current.material.color = new THREE.Color(0, 0, 1)
-    }
+    // rocketBB.current.geometry.computeBoundingBox()
+    //
+    // childBB.current.geometry.computeBoundingBox()
+    // if (type === planet) {
+    //   objectRef.current.rotation.y += delta / 30
+    // }
+    //
+    // if (rocketBB.current.geometry.boundingBox) {
+    //   box.copy(rocketBB.current.geometry.boundingBox).applyMatrix4(rocketBB.current.matrixWorld)
+    //
+    //   childBox.copy(childBB.current.geometry.boundingBox).applyMatrix4(childBB.current.matrixWorld)
+    // }
+    //
+    // //if it intersects
+    // const intersects = box.intersectsBox(childBox)
+    // console.log('intersects', intersects)
+    // if (intersects) {
+    //   console.log(childBB.current)
+    //   childBB.current.material.color = new THREE.Color(1, 0, 0)
+    // } else {
+    //   childBB.current.material.color = new THREE.Color(0, 0, 1)
+    // }
   })
 
   //we return the children as a group bceause it anchors the loading state HTML to world [0,0,0]. Othewise the div will drift with the meshes
   return (
     <>
-      <mesh position={position} ref={childBB} scale={1}>
-        <primitive key={object.name} ref={objectRef} object={gltf.scene} scale={scale}>
-          {object.children.map((child, i) => {
-            const childObject = object.children[i]
-            return <Child rocketBB={rocketBB} key={child.name} object={childObject} asset={object} />
-          })}
-        </primitive>
-        <meshBasicMaterial color={'blue'} transparent={true} opacity={0.5} />
-        <boxGeometry args={[20, 20, 20]}></boxGeometry>
-      </mesh>
+      <primitive position={position} key={object.name} ref={objectRef} object={gltf.scene} scale={scale}>
+        {object.children.map((child, i) => {
+          const childObject = object.children[i]
+          return <Child rocketBB={rocketBB} key={child.name} object={childObject} asset={object} />
+        })}
+      </primitive>
     </>
   )
 }
+
+// <mesh position={position} ref={childBB} scale={1}>
+//
+//   <meshBasicMaterial color={'blue'} transparent={true} opacity={0.5} />
+//   <boxGeometry args={[20, 20, 20]}></boxGeometry>
+// </mesh>
 const AnimatedChild = ({ object, parent }: PropsObject) => {
   const { position, scale, name, waypoints, type } = object
   const gltf = useGLTF(`/${name}.glb`)
@@ -173,10 +175,6 @@ const AnimatedChild = ({ object, parent }: PropsObject) => {
 
   return (
     <group>
-      <mesh>
-        <boxGeometry args={[5, 5, 5]} />
-        <meshBasicMaterial color='blue' />
-      </mesh>
       <primitive key={object.name} ref={vehicleMesh} position={position} object={gltf.scene} scale={scale}></primitive>
       {object.children.map((child) => {
         //pass the instace of the yuka vehicle to the child so that it can be pursued.
@@ -186,3 +184,8 @@ const AnimatedChild = ({ object, parent }: PropsObject) => {
     </group>
   )
 }
+
+// <mesh>
+//   <boxGeometry args={[5, 5, 5]} />
+//   <meshBasicMaterial color='blue' />
+// </mesh>
