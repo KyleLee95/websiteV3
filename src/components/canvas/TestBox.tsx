@@ -1,12 +1,14 @@
-import { useRef, useEffect } from 'react'
-import { useRaycastVehicle, useBox } from '@react-three/cannon'
+import { useState, useRef, useEffect } from 'react'
+import { useRaycastVehicle, useBox, Triplet } from '@react-three/cannon'
 import { useKeyboardControls } from '@react-three/drei'
-import { useFrame } from '@react-three/fiber'
+import { useFrame, useLoader } from '@react-three/fiber'
+import { GLTFLoader } from 'three-stdlib'
 import { useWheels } from './useWheels'
 import { useControls } from './useControls'
 import * as CANNON from 'cannon-es'
 import * as THREE from 'three'
 export const TestBox = (thirdPerson) => {
+  const gltf = useLoader(GLTFLoader, '/rocket.glb')
   const [box, boxAPI] = useBox(
     () => ({
       args: [2, 2, 2],
@@ -16,13 +18,13 @@ export const TestBox = (thirdPerson) => {
     useRef(),
   )
 
-  const position = [-1.5, 0.5, 3]
+  const position: Triplet = [-1.5, 1.5, 3]
   const width = 0.15
   const height = 0.07
   const front = 0.15
   const wheelRadius = 0.05
 
-  const chassisBodyArgs = [width, height, front * 2]
+  const chassisBodyArgs: Triplet = [width, height, front * 2]
   const [chassisBody, chassisApi] = useBox(
     () => ({
       allowSleep: false,
@@ -44,73 +46,49 @@ export const TestBox = (thirdPerson) => {
     useRef(null),
   )
 
+  const [smoothedCameraPosition] = useState(() => new THREE.Vector3(10, 10, 10))
+  const [smoothedCameraTarget] = useState(() => new THREE.Vector3())
   useControls(vehicleApi, chassisApi)
   const [subscribeKeys, getKeys] = useKeyboardControls()
 
-  // const movement = { forward: 0, strafe: 0, pitch: 0, yaw: 0 }
-  // const { forward, strafe, pitch, yaw } = movement
-  // useFrame((state, delta) => {
-  //   const { up, left, right } = getKeys()
-  //   if (up) {
-  //     const angle = Math.PI // rotate 90 degrees
-  //     const axis = new CANNON.Vec3(0, 1, 0) // rotate around the Y-axis
-  //
-  //     // Create a quaternion representing the rotation
-  //     const quaternion = new CANNON.Quaternion()
-  //     quaternion.setFromAxisAngle(axis, angle)
-  //
-  //     // Set the rotation of the body
-  //     boxAPI.quaternion.set(quaternion.x, quaternion.y, quaternion.z, quaternion.w)
-  //     box.quaternion.copy(new THREE.Quaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w))
-  //   }
-  //   if (left) {
-  //     const angle = -Math.PI / 2 // rotate 90 degrees
-  //     const axis = new CANNON.Vec3(0, 1, 0) // rotate around the Y-axis
-  //
-  //     // Create a quaternion representing the rotation
-  //     const quaternion = new CANNON.Quaternion()
-  //     quaternion.setFromAxisAngle(axis, angle)
-  //
-  //     // Set the rotation of the body
-  //     boxAPI.quaternion.set(quaternion.x, quaternion.y, quaternion.z, quaternion.w)
-  //     box.quaternion.copy(new THREE.Quaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w))
-  //     const impulse = new CANNON.Vec3(-10 * delta, 0, 0)
-  //     boxAPI.applyImpulse([-1, 0, 0], [1, 1, 0])
-  //   }
-  //   if (right) {
-  //     const angle = Math.PI / 2 // rotate 90 degrees
-  //     const axis = new CANNON.Vec3(0, 1, 0) // rotate around the Y-axis
-  //
-  //     // Create a quaternion representing the rotation
-  //     const quaternion = new CANNON.Quaternion()
-  //     quaternion.setFromAxisAngle(axis, angle)
-  //
-  //     // Set the rotation of the body
-  //     boxAPI.quaternion.set(quaternion.x, quaternion.y, quaternion.z, quaternion.w)
-  //     box.quaternion.copy(new THREE.Quaternion(quaternion.x, quaternion.y, quaternion.z, quaternion.w))
-  //   }
-  // })
-
-  useFrame((state) => {
+  useFrame((state, delta) => {
     if (!thirdPerson) return
+    console.log(chassisBody)
 
-    let position = new THREE.Vector3(0, 0, 0)
-    position.setFromMatrixPosition(chassisBody.current.matrixWorld)
+    const cameraTarget = new THREE.Vector3()
+    cameraTarget.setFromMatrixPosition(chassisBody.current.matrixWorld)
+    cameraTarget.y += 0.25
 
+    const position = new THREE.Vector3().setFromMatrixPosition(chassisBody.current.matrixWorld)
     let quaternion = new THREE.Quaternion(0, 0, 0, 0)
     quaternion.setFromRotationMatrix(chassisBody.current.matrixWorld)
-
     let wDir = new THREE.Vector3(0, 0, 1)
     wDir.applyQuaternion(quaternion)
     wDir.normalize()
 
+    wDir.add(new THREE.Vector3(0, 0.2, 0))
     let cameraPosition = position.clone().add(wDir.clone().multiplyScalar(1).add(new THREE.Vector3(0, 0.3, 0)))
 
-    wDir.add(new THREE.Vector3(0, 0.2, 0))
-    state.camera.position.copy(cameraPosition)
-    state.camera.lookAt(position)
+    smoothedCameraPosition.lerp(cameraPosition, 5 * delta)
+    smoothedCameraTarget.lerp(cameraTarget, 5 * delta)
+    state.camera.position.copy(smoothedCameraPosition)
+    state.camera.lookAt(smoothedCameraTarget)
   })
 
+  // const cameraPosition = new THREE.Vector3();
+  // cameraPosition.copy(bodyPosition);
+  // cameraPosition.z += 2.25;
+  // cameraPosition.y += 0.65;
+  //
+  // const cameraTarget = new THREE.Vector3();
+  // cameraTarget.copy(bodyPosition);
+  // cameraTarget.y += 0.25;
+  //
+  // smoothedCameraPosition.lerp(cameraPosition, 5 * delta);
+  // smoothedCameraTarget.lerp(cameraTarget, 5 * delta);
+  //
+  // state.camera.position.copy(smoothedCameraPosition);
+  // state.camera.lookAt(smoothedCameraTarget);
   // useEffect(() => {
   //   if (!result) return
   //
@@ -123,7 +101,7 @@ export const TestBox = (thirdPerson) => {
   return (
     <group ref={vehicle} name='vehicle'>
       <group ref={chassisBody} name='chassisBody'>
-        <primitive object={new THREE.BoxGeometry(1, 1, 1)} position={[0, -0.09, 0]} />
+        <primitive object={gltf.scene} position={[0, 0, 0]} scale={0.1} />
       </group>
       {/* <mesh ref={chassisBody}>
         <meshBasicMaterial transparent={true} opacity={0.3} />

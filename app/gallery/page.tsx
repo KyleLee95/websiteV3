@@ -97,7 +97,7 @@ export default function Page() {
     <Suspense fallback={<Loader />}>
       <View orbit={false} className='h-full w-full'>
         <Physics>
-          <Debug scale={1.2} color='red'>
+          <Debug scale={1.2} color=''>
             <KeyboardControls
               map={[
                 { name: 'up', keys: ['ArrowUp', 'KeyW'] },
