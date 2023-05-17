@@ -5,7 +5,14 @@ import { GLTFLoader } from 'three-stdlib'
 import { useWheels } from './useWheels'
 import { useControls } from './useControls'
 import * as THREE from 'three'
-export const Rocket = (thirdPerson) => {
+export const Rocket = () => {
+  const rocket = useRef(null)
+  useEffect(() => {
+    if (!rocket) {
+      return
+    }
+    rocket.current.rotateX(-Math.PI / 2)
+  }, [rocket])
   const gltf = useLoader(GLTFLoader, '/rocket.glb')
 
   const position: Triplet = [10, 0, 0]
@@ -41,7 +48,7 @@ export const Rocket = (thirdPerson) => {
   useControls(vehicleApi, chassisApi)
 
   useFrame((state, delta) => {
-    if (!thirdPerson) return
+    rocket.current.rotation.y += delta
     const cameraTarget = new THREE.Vector3()
     cameraTarget.setFromMatrixPosition(chassisBody.current.matrixWorld)
     cameraTarget.y += 0.25
@@ -65,7 +72,7 @@ export const Rocket = (thirdPerson) => {
   return (
     <group ref={vehicle} name='vehicle'>
       <group ref={chassisBody} name='chassisBody'>
-        <primitive object={gltf.scene} position={[0, 0, 0]} scale={0.1} />
+        <primitive ref={rocket} object={gltf.scene} position={[0, 0, 0]} scale={0.1} />
       </group>
     </group>
   )

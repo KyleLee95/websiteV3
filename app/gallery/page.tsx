@@ -2,11 +2,14 @@
 import * as THREE from 'three'
 import dynamic from 'next/dynamic'
 import { Vector3 } from 'three'
-import { Html, useProgress } from '@react-three/drei'
+import { Html, Ring, useProgress } from '@react-three/drei'
 import { Suspense } from 'react'
 import { Physics, Debug } from '@react-three/cannon'
 const Galaxy = dynamic(() => import('@/components/canvas/Galaxy').then((mod) => mod.Galaxy), { ssr: false })
 
+const RingChallenge = dynamic(() => import('@/components/canvas/RingChallenge').then((mod) => mod.RingChallenge), {
+  ssr: false,
+})
 const Floor = dynamic(() => import('@/components/canvas/Floor').then((mod) => mod.Floor), { ssr: false })
 const Rocket = dynamic(() => import('@/components/canvas/Rocket').then((mod) => mod.Rocket), { ssr: false })
 const SceneObject = dynamic(() => import('@/components/canvas/SceneObject').then((mod) => mod.SceneObject), {
@@ -42,6 +45,8 @@ export default function Page() {
             <Rocket />
             <Floor />
             <SceneObject />
+
+            <RingChallenge />
           </Debug>
         </Physics>
 
