@@ -2,69 +2,12 @@
 import * as THREE from 'three'
 import dynamic from 'next/dynamic'
 import { Vector3 } from 'three'
-import { KeyboardControls, Html, useProgress, OrbitControls } from '@react-three/drei'
-import { Suspense, useRef } from 'react'
-import { Physics, usePlane, useBox, Debug } from '@react-three/cannon'
-interface SceneObjectType {
-  name: string
-  position: Vector3
-  scale: number
-  type: string
-  children: Array<SceneObjectType>
-}
-const sceneObjects: SceneObjectType[] = [
-  {
-    name: 'dione',
-    position: new THREE.Vector3(50, 5, 0),
-    scale: 0.015,
-    type: 'planet',
-    children: [{ name: 'tgo', position: new THREE.Vector3(2000, 0, 0), scale: 55, type: 'satellite', children: [] }],
-  },
-  { name: 'itokawa', position: new THREE.Vector3(-30, 0, -30), scale: 0.0025, type: 'satellite', children: [] },
-  {
-    name: 'titan',
-    position: new THREE.Vector3(-100, 0, 0),
-    scale: 0.015,
-    type: 'planet',
-    children: [],
-  },
-  { name: 'sun', position: new THREE.Vector3(10, 0, -35), scale: 0.025, type: 'planet', children: [] },
-  { name: 'juno', position: new THREE.Vector3(0, 0, -55), scale: 0.025, type: 'planet', children: [] },
-  { name: 'saturn', position: new THREE.Vector3(20, 0, 105), scale: 0.025, type: 'planet', children: [] },
-  { name: 'rhea', position: new THREE.Vector3(-100, 0, -300), scale: 0.025, type: 'planet', children: [] },
-  { name: 'uranus', position: new THREE.Vector3(-100, 0, 100), scale: 0.025, type: 'planet', children: [] },
-  {
-    name: 'earth',
-    position: new THREE.Vector3(-50, 0, -75),
-    scale: 0.025,
-    type: 'planet',
-    children: [{ name: 'iss', position: new THREE.Vector3(-2000, 0, -75), scale: 3, type: 'satellite', children: [] }],
-  },
-
-  {
-    name: 'swordfish',
-    position: new THREE.Vector3(-50, 0, 70),
-    scale: 1,
-    type: 'ship',
-    children: [{ name: 'redtail', position: new THREE.Vector3(-10, 0, 10), scale: 1, type: 'ship', children: [] }],
-  },
-
-  {
-    name: 'mandalorian',
-    position: new THREE.Vector3(30, 0, 70),
-    scale: 1,
-    type: 'ship',
-    children: [{ name: 'tiefighter', position: new THREE.Vector3(30, 0, 10), scale: 1, type: 'ship', children: [] }],
-  },
-]
-
-const YukaVehicle = dynamic(() => import('@/components/canvas/YukaVehicle').then((mod) => mod.YukaVehicle), {
-  ssr: false,
-})
+import { Html, useProgress } from '@react-three/drei'
+import { Suspense } from 'react'
+import { Physics, Debug } from '@react-three/cannon'
 const Galaxy = dynamic(() => import('@/components/canvas/Galaxy').then((mod) => mod.Galaxy), { ssr: false })
 
-const TestPlane = dynamic(() => import('@/components/canvas/TestPlane').then((mod) => mod.TestPlane), { ssr: false })
-const TestBox = dynamic(() => import('@/components/canvas/TestBox').then((mod) => mod.TestBox), { ssr: false })
+const Floor = dynamic(() => import('@/components/canvas/Floor').then((mod) => mod.Floor), { ssr: false })
 const Rocket = dynamic(() => import('@/components/canvas/Rocket').then((mod) => mod.Rocket), { ssr: false })
 const SceneObject = dynamic(() => import('@/components/canvas/SceneObject').then((mod) => mod.SceneObject), {
   ssr: false,
@@ -96,29 +39,15 @@ export default function Page() {
       <View orbit={false} className='h-full w-full'>
         <Physics>
           <Debug scale={1} color='red'>
-            <KeyboardControls
-              map={[
-                { name: 'up', keys: ['ArrowUp', 'KeyW'] },
-                { name: 'left', keys: ['ArrowLeft', 'KeyA'] },
-                { name: 'right', keys: ['ArrowRight', 'KeyD'] },
-              ]}
-            >
-              <Galaxy />
-
-              <TestBox />
-              <TestPlane />
-            </KeyboardControls>
+            <Rocket />
+            <Floor />
             <SceneObject />
           </Debug>
-          <OrbitControls />
-          <gridHelper />
-          <Common color='black' />
         </Physics>
+
+        <Common color='black' />
+        <Galaxy />
       </View>
     </Suspense>
   )
 }
-
-// <Galaxy />
-//
-//   <Rocket rocketBB={rocketBB} />

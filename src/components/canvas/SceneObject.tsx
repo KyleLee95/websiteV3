@@ -61,7 +61,7 @@ export function SceneObject() {
   )
 }
 
-const Child = ({ object, rocketBB }: PropsObject) => {
+const Child = ({ object }: PropsObject) => {
   const { position, scale, name, type } = object
   const gltf = useGLTF(`/${name}.glb`)
   const objectRef = useRef(null)
@@ -81,7 +81,6 @@ const Child = ({ object, rocketBB }: PropsObject) => {
       objectRef.current.rotation.y += delta / 30
     }
   })
-  //we return the children as a group bceause it anchors the loading state HTML to world [0,0,0]. Othewise the div will drift with the meshes
   return (
     <>
       <primitive position={position} key={object.name} ref={objectRef} object={gltf.scene} scale={scale}>

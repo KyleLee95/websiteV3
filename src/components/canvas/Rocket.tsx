@@ -1,78 +1,72 @@
-import { useRef, useEffect } from 'react'
-import { useFrame, useLoader, useThree } from '@react-three/fiber'
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader'
-import { useKeyboardControls } from '@react-three/drei'
+import { useState, useRef, useEffect } from 'react'
+import { useRaycastVehicle, useBox, Triplet } from '@react-three/cannon'
+import { useFrame, useLoader } from '@react-three/fiber'
+import { GLTFLoader } from 'three-stdlib'
+import { useWheels } from './useWheels'
+import { useControls } from './useControls'
 import * as THREE from 'three'
-
-//Some helpers to get the camera working correctly
-const calculateIdealLookAt = (rotation: THREE.Euler, position: THREE.Vector3) => {
-  const idealLookAt = new THREE.Vector3(2, 2, 2)
-  idealLookAt.applyEuler(rotation)
-  idealLookAt.add(position)
-  return idealLookAt
-}
-const calculateIdealOffset = (rotation: THREE.Euler, position: THREE.Vector3) => {
-  const idealOffset = new THREE.Vector3(0, -55, 70)
-  idealOffset.applyEuler(rotation)
-  idealOffset.add(position)
-  return idealOffset
-}
-
-export function Rocket() {
-  const rocketGroup = useRef(null)
-  const rocket = useRef(null)
-  const three = useThree()
-  const { clock } = three
-  const elapsedTime = clock.elapsedTime
-  const currPosition = new THREE.Vector3()
-  const currLookAt = new THREE.Vector3()
-
-  const [subscribeKeys, getKeys] = useKeyboardControls()
-
-  useEffect(() => {
-    //rotate the rocket so that it's sideways
-    rocketGroup.current.rotation.set(-1.5, 0, 0)
-  }, [rocketGroup, rocket])
-
-  useFrame((state, delta) => {
-    const { forward, left, right } = getKeys()
-    if (forward) {
-      rocketGroup.current.translateY(0.5)
-    }
-    if (left) {
-      const angleOfRotation = Math.PI / 100
-      rocketGroup.current.rotateZ(angleOfRotation)
-    }
-    if (right) {
-      const angleOfRotation = -Math.PI / 100
-      rocketGroup.current.rotateZ(angleOfRotation)
-    }
-  })
-
-  //chase camera
-  useFrame((state, delta) => {
-    const group = rocketGroup.current
-    rocket.current.rotation.y += delta //rotate the rocket for cool animation
-    const idealOffset = calculateIdealOffset(group.rotation, group.position)
-    const idealLookAt = calculateIdealLookAt(group.rotation, group.position)
-    //lerping makes camera movement independent of the frame rate
-    const lerpSmoothingCoefficient = Math.pow(0.001, elapsedTime)
-    currPosition.lerp(idealOffset, lerpSmoothingCoefficient)
-    currLookAt.lerp(idealLookAt, lerpSmoothingCoefficient)
-    state.camera.position.copy(currPosition)
-    state.camera.lookAt(currLookAt)
-  })
-
+export const Rocket = (thirdPerson) => {
   const gltf = useLoader(GLTFLoader, '/rocket.glb')
 
-  return (
-    <group ref={rocketGroup}>
-      <primitive ref={rocket} position={[0, 0, 0]} object={gltf.scene} scale={1}></primitive>
+  const position: Triplet = [10, 0, 0]
+  const width = 0.15
+  const height = 0.07
+  const front = 0.15
+  const wheelRadius = 0.05
 
-      <mesh ref={rocketBB}>
-        <boxGeometry args={[10, 10, 10]} />
-        <meshBasicMaterial color='orange' />
-      </mesh>
+  const chassisBodyArgs: Triplet = [width, height, front * 2]
+  const [chassisBody, chassisApi] = useBox(
+    () => ({
+      allowSleep: false,
+      args: chassisBodyArgs,
+      mass: 150,
+      position,
+    }),
+    useRef(null),
+  )
+
+  const [wheels, wheelInfos] = useWheels(width, height, front, wheelRadius)
+
+  const [vehicle, vehicleApi] = useRaycastVehicle(
+    () => ({
+      chassisBody,
+      wheelInfos,
+      wheels,
+    }),
+    useRef(null),
+  )
+
+  const [smoothedCameraPosition] = useState(() => new THREE.Vector3(10, 10, 10))
+  const [smoothedCameraTarget] = useState(() => new THREE.Vector3())
+  useControls(vehicleApi, chassisApi)
+
+  useFrame((state, delta) => {
+    if (!thirdPerson) return
+    const cameraTarget = new THREE.Vector3()
+    cameraTarget.setFromMatrixPosition(chassisBody.current.matrixWorld)
+    cameraTarget.y += 0.25
+
+    const position = new THREE.Vector3().setFromMatrixPosition(chassisBody.current.matrixWorld)
+    const quaternion = new THREE.Quaternion(0, 0, 0, 0)
+    quaternion.setFromRotationMatrix(chassisBody.current.matrixWorld)
+    let wDir = new THREE.Vector3(0, 0, 1)
+    wDir.applyQuaternion(quaternion)
+    wDir.add(new THREE.Vector3(0, 0.2, 0))
+    wDir.normalize()
+
+    let cameraPosition = position.clone().add(wDir.clone().multiplyScalar(2).add(new THREE.Vector3(0, 0.1, 0)))
+
+    smoothedCameraPosition.lerp(cameraPosition, 5 * delta)
+    smoothedCameraTarget.lerp(cameraTarget, 5 * delta)
+    state.camera.position.copy(smoothedCameraPosition)
+    state.camera.lookAt(smoothedCameraTarget)
+  })
+
+  return (
+    <group ref={vehicle} name='vehicle'>
+      <group ref={chassisBody} name='chassisBody'>
+        <primitive object={gltf.scene} position={[0, 0, 0]} scale={0.1} />
+      </group>
     </group>
   )
 }

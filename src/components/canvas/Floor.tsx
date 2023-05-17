@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { usePlane, useBox } from '@react-three/cannon'
-export const TestPlane = () => {
+export const Floor = () => {
   const [plane, planeAPI] = usePlane(
     () => ({
       args: [1000, 1000],
