@@ -37,14 +37,14 @@ export const useControls = (vehicleApi, chassisApi) => {
 
     //@ts-ignore
     if (controls.a) {
-      vehicleApi.setSteeringValue(0.35, 2)
-      vehicleApi.setSteeringValue(0.35, 3)
+      vehicleApi.setSteeringValue(0, 2)
+      vehicleApi.setSteeringValue(0, 3)
       vehicleApi.setSteeringValue(-0.1, 0)
       vehicleApi.setSteeringValue(-0.1, 1)
       //@ts-ignore
     } else if (controls.d) {
-      vehicleApi.setSteeringValue(-0.35, 2)
-      vehicleApi.setSteeringValue(-0.35, 3)
+      vehicleApi.setSteeringValue(0, 2)
+      vehicleApi.setSteeringValue(0, 3)
       vehicleApi.setSteeringValue(0.1, 0)
       vehicleApi.setSteeringValue(0.1, 1)
     } else {
@@ -61,7 +61,6 @@ export const useControls = (vehicleApi, chassisApi) => {
     if (controls.arrowleft) chassisApi.applyLocalImpulse([0, -5, 0], [-0.5, 0, 0])
     //@ts-ignore
     if (controls.arrowright) chassisApi.applyLocalImpulse([0, -5, 0], [+0.5, 0, 0])
-
     //@ts-ignore
     if (controls.r) {
       chassisApi.position.set(-1.5, 0.5, 3)
