@@ -37,7 +37,9 @@ export const Rocket = () => {
   const [vehicle, vehicleApi] = useRaycastVehicle(
     () => ({
       chassisBody,
+      //@ts-ignore
       wheelInfos,
+      //@ts-ignore
       wheels,
     }),
     useRef(null),

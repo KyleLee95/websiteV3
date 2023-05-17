@@ -1,7 +1,7 @@
-import { useCompoundBody } from '@react-three/cannon'
+import { WheelInfoOptions, useCompoundBody } from '@react-three/cannon'
 import { useRef } from 'react'
 
-export const useWheels = (width, height, front, radius) => {
+export const useWheels = (width: number, height: number, front: number, radius: number) => {
   const wheels = [useRef(null), useRef(null), useRef(null), useRef(null)]
 
   const wheelInfo = {
@@ -56,6 +56,10 @@ export const useWheels = (width, height, front, radius) => {
     type: 'Kinematic',
   })
 
+  /*
+   *
+   * //@ts-ignore
+   * */
   useCompoundBody(propsFunc, wheels[0])
   useCompoundBody(propsFunc, wheels[1])
   useCompoundBody(propsFunc, wheels[2])
