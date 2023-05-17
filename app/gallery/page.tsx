@@ -91,13 +91,11 @@ const Loader = () => {
 }
 
 export default function Page() {
-  const rocketBB = useRef()
-
   return (
     <Suspense fallback={<Loader />}>
       <View orbit={false} className='h-full w-full'>
         <Physics>
-          <Debug scale={1.2} color=''>
+          <Debug scale={1} color='red'>
             <KeyboardControls
               map={[
                 { name: 'up', keys: ['ArrowUp', 'KeyW'] },
@@ -105,10 +103,12 @@ export default function Page() {
                 { name: 'right', keys: ['ArrowRight', 'KeyD'] },
               ]}
             >
+              <Galaxy />
+
               <TestBox />
               <TestPlane />
             </KeyboardControls>
-            <SceneObject rocketBB={rocketBB} />
+            <SceneObject />
           </Debug>
           <OrbitControls />
           <gridHelper />

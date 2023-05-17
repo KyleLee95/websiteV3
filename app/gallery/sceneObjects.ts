@@ -78,7 +78,7 @@ export const sceneObjects: SceneObjectType[] = [
     ],
     waypoints: [],
   },
-  { name: 'iss', position: new THREE.Vector3(-20, 0, -10), scale: 0.1, type: 'satellite', children: [], waypoints: [] },
+  { name: 'iss', position: new THREE.Vector3(-20, 0, -40), scale: 0.1, type: 'satellite', children: [], waypoints: [] },
   {
     name: 'swordfish',
     position: new THREE.Vector3(-50, 0, 70),

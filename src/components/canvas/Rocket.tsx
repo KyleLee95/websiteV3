@@ -18,8 +18,7 @@ const calculateIdealOffset = (rotation: THREE.Euler, position: THREE.Vector3) =>
   return idealOffset
 }
 
-export function Rocket(props) {
-  const { rocketBB } = props
+export function Rocket() {
   const rocketGroup = useRef(null)
   const rocket = useRef(null)
   const three = useThree()

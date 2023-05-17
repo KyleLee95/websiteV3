@@ -4,7 +4,7 @@ import { useThree } from '@react-three/fiber'
 export const Galaxy = () => {
   const parameters = {
     count: 36000,
-    size: 0.5,
+    size: 0.15,
     radius: 1600,
     branches: 7,
     spin: -0.732,
