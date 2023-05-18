@@ -6,7 +6,7 @@ import { Html, Ring, useProgress } from '@react-three/drei'
 import { Suspense } from 'react'
 import { Physics, Debug } from '@react-three/cannon'
 const Galaxy = dynamic(() => import('@/components/canvas/Galaxy').then((mod) => mod.Galaxy), { ssr: false })
-
+//@ts-ignore
 const RingChallenge = dynamic(() => import('@/components/canvas/RingChallenge').then((mod) => mod.RingChallenge), {
   ssr: false,
 })

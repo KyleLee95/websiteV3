@@ -56,13 +56,14 @@ export const useWheels = (width: number, height: number, front: number, radius: 
     type: 'Kinematic',
   })
 
-  /*
-   *
-   * //@ts-ignore
-   * */
+  //@ts-ignore
+
   useCompoundBody(propsFunc, wheels[0])
+  //@ts-ignore
   useCompoundBody(propsFunc, wheels[1])
+  //@ts-ignore
   useCompoundBody(propsFunc, wheels[2])
+  //@ts-ignore
   useCompoundBody(propsFunc, wheels[3])
 
   return [wheels, wheelInfos]
