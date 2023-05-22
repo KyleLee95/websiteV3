@@ -38,12 +38,7 @@ export default function Page() {
   return (
     <Suspense fallback={<Loader />}>
       <View orbit={false} className='h-full w-full'>
-        <KeyboardControls
-          map={[
-            { name: 'go', keys: ['Space'] },
-            { name: 'forward', keys: ['KeyW'] },
-          ]}
-        >
+        <KeyboardControls map={[{ name: 'go', keys: ['Space'] }]}>
           <Physics>
             <Debug scale={1} color='red'>
               <Rocket />

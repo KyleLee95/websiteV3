@@ -65,25 +65,10 @@ export function SceneObject() {
   )
 }
 const zOffset = 2
-const yOffset = 1
-const planeWidth = 3
-const planeDepth = 5
-const handleZoneGoTo = (event, name: string) => {
-  console.log(event)
-  console.log('name', name)
-  if (event.key !== 'Enter') return
-  if (name === 'github') {
-    window.open('github.com/kylelee95')
-  } else if (name === 'linkedin') {
-    window.open('https://www.linkedin.com/in/kyle-lee-7b39ab1a6/')
-  } else if (name === 'emai') {
-    window.open(`mailto:kyle@kylelee.dev?Subject='hello!'`)
-  }
-}
 const InteractiveZone = (props: any) => {
   const { position, networkRef, asset, name } = props
   const [showZone, setShowZone] = useState(false)
-
+  const [paused, setPaused] = useState(false)
   const [subscribeKeys, getKeys] = useKeyboardControls()
   const [zone, zoneAPI] = useBox(() => ({
     args: [2, 2, 10],
@@ -99,9 +84,16 @@ const InteractiveZone = (props: any) => {
   }))
 
   useFrame((state, delta) => {
-    const { go } = getKeys()
+    let { go } = getKeys()
     if (showZone && go) {
-      window.open('google.com')
+      setShowZone(false)
+      setPaused(true)
+
+      window.open('linkedin.com', '_blank')
+      return
+    }
+    if (!showZone && go) {
+      setPaused(false)
     }
     if (showZone) {
       networkRef.current.rotation.y += delta
@@ -112,6 +104,11 @@ const InteractiveZone = (props: any) => {
       {showZone ? (
         <Html position={position} style={{ background: 'white' }}>
           Press Space
+        </Html>
+      ) : null}
+      {paused ? (
+        <Html position={position} style={{ background: 'white' }}>
+          Press Space to unpause
         </Html>
       ) : null}
     </>
