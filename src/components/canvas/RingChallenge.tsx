@@ -2,7 +2,7 @@ import * as THREE from 'three'
 import * as CANNON from 'cannon-es'
 import { useEffect, useRef } from 'react'
 import { Vector3 } from '@react-three/fiber'
-import { useTrimesh, useConvexPolyhedron } from '@react-three/cannon'
+import { useTrimesh, useConvexPolyhedron, Triplet } from '@react-three/cannon'
 function CreateTrimesh(geometry: THREE.BufferGeometry) {
   const vertices = (geometry.attributes.position as THREE.BufferAttribute).array
   const indices = Object.keys(vertices).map(Number)
@@ -14,20 +14,22 @@ const Ring = (props) => {
   const ringMesh = useRef(null)
   //TODO: improve this
   //essentially, make the mesh we want and feed it into the triMesh hook so that we can a bespoke collider
-  const mesh = new THREE.Mesh(new THREE.TorusGeometry(10, 3, 16, 100), new THREE.MeshBasicMaterial({ color: 'orange' }))
-  const verticies = (mesh.geometry.attributes.position as THREE.BufferAttribute).array
-  const inidices = Object.keys(verticies).map(Number)
-  //the use-cannon hooks implicitly return the colliders
-  const [ring, ringAPI] = useTrimesh(() => ({
-    args: [verticies, inidices],
-  }))
+  //
+  const geometry = new THREE.TorusGeometry(10, 2, 30, 100)
+  const mesh = new THREE.Mesh(geometry, new THREE.MeshBasicMaterial({ color: 'orange' }))
+  // the use - cannon hooks implicitly return the colliders
+  // const colliderPosition: Triplet = [position.x, position.y, position.z]
+  // const [ring, ringAPI] = useTrimesh(() => ({
+  //   args: [verticies, indices],
+  // }))
   useEffect(() => {
     if (!ringMesh.current) return
     const torusShape = CreateTrimesh(ringMesh.current.geometry)
   }, [ringMesh])
   return (
-    <mesh ref={ringMesh} position={position}>
-      <torusGeometry />
+    <mesh ref={ringMesh} scale={0.1} position={position}>
+      <torusGeometry args={[10, 2, 3, 100]} />
+
       <meshBasicMaterial color='orange' />
     </mesh>
   )

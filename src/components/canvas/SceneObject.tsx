@@ -19,7 +19,6 @@ interface PropsObject {
   object: ObjectPropType
   parent?: ObjectPropType
   asset: any
-  rocketBB?: Ref<THREE.Mesh>
 }
 
 /*
@@ -47,6 +46,7 @@ const Loader = () => {
     </Html>
   )
 }
+
 export function SceneObject() {
   return (
     <Suspense fallback={<Loader />}>
@@ -61,6 +61,22 @@ export function SceneObject() {
   )
 }
 
+const InteractiveChild = ({ object }: PropsObject) => {
+  const { position, scale, name, type } = object
+  const gltf = useGLTF(`/${name}.glb`)
+  const objectRef = useRef(null)
+
+  const [box, boxAPI] = useBox(() => ({
+    position: [position.x, position.y, position.z],
+  }))
+  useFrame((state, delta) => {
+    if (type === planet) {
+      objectRef.current.rotation.y += delta / 30
+    }
+  })
+  return <primitive position={position} key={object.name} ref={objectRef} object={gltf.scene} scale={scale} />
+}
+
 const Child = ({ object }: PropsObject) => {
   const { position, scale, name, type } = object
   const gltf = useGLTF(`/${name}.glb`)
@@ -70,9 +86,11 @@ const Child = ({ object }: PropsObject) => {
     args = [10, 10, 10]
   } else if (type === planet) {
     args = [20, 20, 20]
+  } else {
+    args = [1, 1, 1]
   }
 
-  const [sphere, sphereAPI] = useBox(() => ({
+  const [box, boxAPI] = useBox(() => ({
     args,
     position: [position.x, position.y, position.z],
   }))
