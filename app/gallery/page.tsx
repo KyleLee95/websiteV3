@@ -1,6 +1,6 @@
 'use client'
 import dynamic from 'next/dynamic'
-import { Html, useProgress } from '@react-three/drei'
+import { Html, KeyboardControls, useProgress } from '@react-three/drei'
 import { Suspense } from 'react'
 import { Physics, Debug } from '@react-three/cannon'
 const Galaxy = dynamic(() => import('@/components/canvas/Galaxy').then((mod) => mod.Galaxy), { ssr: false })
@@ -38,18 +38,25 @@ export default function Page() {
   return (
     <Suspense fallback={<Loader />}>
       <View orbit={false} className='h-full w-full'>
-        <Physics>
-          <Debug scale={1} color='red'>
-            <Rocket />
-            <Floor />
-            <SceneObject />
+        <KeyboardControls
+          map={[
+            { name: 'go', keys: ['Space'] },
+            { name: 'forward', keys: ['KeyW'] },
+          ]}
+        >
+          <Physics>
+            <Debug scale={1} color='red'>
+              <Rocket />
+              <Floor />
+              <SceneObject />
 
-            <RingChallenge />
-          </Debug>
-        </Physics>
+              <RingChallenge />
+            </Debug>
+          </Physics>
 
-        <Common color='black' />
-        <Galaxy />
+          <Common color='black' />
+          <Galaxy />
+        </KeyboardControls>
       </View>
     </Suspense>
   )

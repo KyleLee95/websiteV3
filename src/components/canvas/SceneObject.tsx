@@ -1,12 +1,11 @@
 import * as THREE from 'three'
 import * as YUKA from 'yuka'
-import { useRef, useState, useEffect, Suspense, Ref, KeyboardEventHandler } from 'react'
+import { useRef, useState, useEffect, Suspense } from 'react'
 import { useFrame } from '@react-three/fiber'
-import { Html, useGLTF, useProgress } from '@react-three/drei'
+import { Html, useGLTF, useKeyboardControls, useProgress } from '@react-three/drei'
 import { Vector3 } from 'three'
 import { sceneObjects } from '@/gallery/sceneObjects'
-import { useSphere, useBox, usePlane } from '@react-three/cannon'
-import { win32 } from 'path'
+import { useBox } from '@react-three/cannon'
 interface ObjectPropType {
   position: Vector3
   scale: number
@@ -83,8 +82,9 @@ const handleZoneGoTo = (event, name: string) => {
 }
 const InteractiveZone = (props: any) => {
   const { position, networkRef, asset, name } = props
-  const zoneMesh = useRef(null)
   const [showZone, setShowZone] = useState(false)
+
+  const [subscribeKeys, getKeys] = useKeyboardControls()
   const [zone, zoneAPI] = useBox(() => ({
     args: [2, 2, 10],
     position: [position.x, position.y, position.z + zOffset],
@@ -99,6 +99,10 @@ const InteractiveZone = (props: any) => {
   }))
 
   useFrame((state, delta) => {
+    const { go } = getKeys()
+    if (showZone && go) {
+      window.open('google.com')
+    }
     if (showZone) {
       networkRef.current.rotation.y += delta
     }
@@ -107,8 +111,7 @@ const InteractiveZone = (props: any) => {
     <>
       {showZone ? (
         <Html position={position} style={{ background: 'white' }}>
-          {' '}
-          Press Enter
+          Press Space
         </Html>
       ) : null}
     </>
@@ -119,12 +122,11 @@ const InteractiveChild = ({ object }: PropsObject) => {
   const { position, scale, name } = object
   const gltf = useGLTF(`/${name}.glb`)
   const objectRef = useRef(null)
-
   const [box, boxAPI] = useBox(() => ({
     position: [position.x, position.y, position.z],
     args: [2, 2, 2],
   }))
-
+  useEffect(() => {}, [])
   return (
     <>
       <primitive position={position} key={object.name} ref={objectRef} object={gltf.scene} scale={scale} />
