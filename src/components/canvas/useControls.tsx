@@ -24,12 +24,12 @@ export const useControls = (vehicleApi, chassisApi) => {
     if (!vehicleApi || !chassisApi) return
     //@ts-ignore
     if (controls.w) {
-      vehicleApi.applyEngineForce(150, 2)
-      vehicleApi.applyEngineForce(150, 3)
+      vehicleApi.applyEngineForce(90, 2)
+      vehicleApi.applyEngineForce(90, 3)
       //@ts-ignore
     } else if (controls.s) {
-      vehicleApi.applyEngineForce(-150, 2)
-      vehicleApi.applyEngineForce(-150, 3)
+      vehicleApi.applyEngineForce(-90, 2)
+      vehicleApi.applyEngineForce(-90, 3)
     } else {
       vehicleApi.applyEngineForce(0, 2)
       vehicleApi.applyEngineForce(0, 3)

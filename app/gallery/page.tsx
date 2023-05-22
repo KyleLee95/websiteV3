@@ -1,8 +1,6 @@
 'use client'
-import * as THREE from 'three'
 import dynamic from 'next/dynamic'
-import { Vector3 } from 'three'
-import { Html, Ring, useProgress } from '@react-three/drei'
+import { Html, useProgress } from '@react-three/drei'
 import { Suspense } from 'react'
 import { Physics, Debug } from '@react-three/cannon'
 const Galaxy = dynamic(() => import('@/components/canvas/Galaxy').then((mod) => mod.Galaxy), { ssr: false })

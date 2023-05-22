@@ -1,11 +1,12 @@
 import * as THREE from 'three'
 import * as YUKA from 'yuka'
-import { useRef, useState, useEffect, Suspense, Ref } from 'react'
+import { useRef, useState, useEffect, Suspense, Ref, KeyboardEventHandler } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { Html, useGLTF, useProgress } from '@react-three/drei'
 import { Vector3 } from 'three'
 import { sceneObjects } from '@/gallery/sceneObjects'
-import { useSphere, useBox } from '@react-three/cannon'
+import { useSphere, useBox, usePlane } from '@react-three/cannon'
+import { win32 } from 'path'
 interface ObjectPropType {
   position: Vector3
   scale: number
@@ -37,6 +38,7 @@ interface PropsObject {
 const planet = 'planet'
 const satellite = 'satellite'
 const ship = 'ship'
+const icon = 'icon'
 const Loader = () => {
   const { progress } = useProgress()
 
@@ -54,27 +56,81 @@ export function SceneObject() {
         const object = sceneObjects[i]
         if (object.type === ship) {
           return <AnimatedChild key={object.name} object={object} asset={asset} />
+        } else if (object.type === icon) {
+          return <InteractiveChild key={object.name} object={object} asset={asset} />
+        } else {
+          return <Child key={object.name} object={object} asset={asset} />
         }
-        return <Child key={object.name} object={object} asset={asset} />
       })}
     </Suspense>
   )
 }
+const zOffset = 2
+const yOffset = 1
+const planeWidth = 3
+const planeDepth = 5
+const handleZoneGoTo = (event, name: string) => {
+  console.log(event)
+  console.log('name', name)
+  if (event.key !== 'Enter') return
+  if (name === 'github') {
+    window.open('github.com/kylelee95')
+  } else if (name === 'linkedin') {
+    window.open('https://www.linkedin.com/in/kyle-lee-7b39ab1a6/')
+  } else if (name === 'emai') {
+    window.open(`mailto:kyle@kylelee.dev?Subject='hello!'`)
+  }
+}
+const InteractiveZone = (props: any) => {
+  const { position, networkRef, asset, name } = props
+  const zoneMesh = useRef(null)
+  const [showZone, setShowZone] = useState(false)
+  const [zone, zoneAPI] = useBox(() => ({
+    args: [2, 2, 10],
+    position: [position.x, position.y, position.z + zOffset],
+    type: 'Kinematic',
+    isTrigger: true,
+    onCollide: () => {
+      setShowZone(true)
+    },
+    onCollideEnd: () => {
+      setShowZone(false)
+    },
+  }))
+
+  useFrame((state, delta) => {
+    if (showZone) {
+      networkRef.current.rotation.y += delta
+    }
+  })
+  return (
+    <>
+      {showZone ? (
+        <Html position={position} style={{ background: 'white' }}>
+          {' '}
+          Press Enter
+        </Html>
+      ) : null}
+    </>
+  )
+}
 
 const InteractiveChild = ({ object }: PropsObject) => {
-  const { position, scale, name, type } = object
+  const { position, scale, name } = object
   const gltf = useGLTF(`/${name}.glb`)
   const objectRef = useRef(null)
 
   const [box, boxAPI] = useBox(() => ({
     position: [position.x, position.y, position.z],
+    args: [2, 2, 2],
   }))
-  useFrame((state, delta) => {
-    if (type === planet) {
-      objectRef.current.rotation.y += delta / 30
-    }
-  })
-  return <primitive position={position} key={object.name} ref={objectRef} object={gltf.scene} scale={scale} />
+
+  return (
+    <>
+      <primitive position={position} key={object.name} ref={objectRef} object={gltf.scene} scale={scale} />
+      <InteractiveZone position={position} name={name} networkRef={objectRef} />
+    </>
+  )
 }
 
 const Child = ({ object }: PropsObject) => {
@@ -94,6 +150,7 @@ const Child = ({ object }: PropsObject) => {
     args,
     position: [position.x, position.y, position.z],
   }))
+  useEffect(() => {}, [boxAPI])
   useFrame((state, delta) => {
     if (type === planet) {
       objectRef.current.rotation.y += delta / 30

@@ -10,9 +10,9 @@ interface SceneObjectType {
   waypoints: Array<YV3>
 }
 export const sceneObjects: SceneObjectType[] = [
-  { name: 'linkedin', position: new THREE.Vector3(-3, 0, -30), scale: 1, type: 'icon', children: [], waypoints: [] },
-  { name: 'github', position: new THREE.Vector3(0, 0, -30), scale: 0.25, type: 'icon', children: [], waypoints: [] },
-  { name: 'email', position: new THREE.Vector3(5, 0, -30), scale: 1, type: 'icon', children: [], waypoints: [] },
+  { name: 'linkedin', position: new THREE.Vector3(-5, 0, -60), scale: 1, type: 'icon', children: [], waypoints: [] },
+  { name: 'github', position: new THREE.Vector3(0, 0, -60), scale: 0.25, type: 'icon', children: [], waypoints: [] },
+  { name: 'email', position: new THREE.Vector3(5, 0, -60), scale: 1, type: 'icon', children: [], waypoints: [] },
   // {
   //   name: 'dione',
   //   position: new THREE.Vector3(50, 5, 0),
